@@ -1,0 +1,8 @@
+app:
+  name: temperature4
+
+cache:
+  roomlist:
+    minutes: 15
+  openweather:
+    minutes: 15
