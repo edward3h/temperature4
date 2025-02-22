@@ -30,7 +30,7 @@ dependencies {
     implementation("org.eclipse.store:storage-embedded:2.1.2")
     implementation("com.github.ben-manes.caffeine:caffeine:3.2.0")
     jteGenerate("gg.jte:jte-models:3.1.16")
-    runtimeOnly("org.logevents:logevents:0.5.6")
+    runtimeOnly("org.logevents:logevents:0.5.7")
     testImplementation("com.google.truth:truth:1.4.4")
 }
 
