@@ -3,12 +3,11 @@ package org.ethelred.temperature4.storage;
 
 import io.avaje.config.Configuration;
 import jakarta.inject.Singleton;
+import java.nio.file.Path;
 import org.eclipse.store.storage.embedded.types.EmbeddedStorage;
 import org.eclipse.store.storage.embedded.types.EmbeddedStorageManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.nio.file.Path;
 
 @Singleton
 public class Storage {
