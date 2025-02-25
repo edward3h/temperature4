@@ -96,7 +96,7 @@ public class UIController {
             action = TemperatureSettingAction.DECREMENT;
         }
         roomService.updateRoom(room, modeE, action);
-        javalinContext.redirect("/room/" + room, HttpStatus.SEE_OTHER);
+        javalinContext.redirect(contextPath + "room/" + room, HttpStatus.SEE_OTHER);
     }
 
     String withLayout(@Nullable Boolean htmx, UIRequestContext req, JteModel content, Context javalinContext) {
