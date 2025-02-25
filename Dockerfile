@@ -5,4 +5,5 @@ RUN mkdir "/config" && mkdir "/data"
 COPY app/build/install/app /
 ENV JAVA_OPTS=--enable-preview
 WORKDIR /config
+EXPOSE 8080
 CMD ["/bin/app"]
