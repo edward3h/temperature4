@@ -2,6 +2,7 @@
 package org.ethelred.temperature4;
 
 import gg.jte.models.runtime.*;
+import io.avaje.config.Configuration;
 import io.avaje.http.api.Consumes;
 import io.avaje.http.api.Controller;
 import io.avaje.http.api.Form;
@@ -22,6 +23,7 @@ import org.jspecify.annotations.Nullable;
 
 @Controller
 public class UIController {
+    private final String contextPath;
     private final Templates templates;
     private final KumoJsClient kumoJsClient;
     private final OpenWeatherClient openWeatherClient;
@@ -30,6 +32,7 @@ public class UIController {
     private final SensorMapping sensorMapping;
 
     public UIController(
+            Configuration configuration,
             Templates templates,
             KumoJsClient kumoJsClient,
             OpenWeatherClient openWeatherClient,
@@ -43,18 +46,20 @@ public class UIController {
         this.roomService = roomService;
         this.sensorMapping = sensorMapping;
         this.settingRepository = settingRepository;
+        this.contextPath = configuration.get("server.contextPath", "/");
     }
 
     @Get("/")
     @Produces(MediaType.TEXT_HTML)
-    public String index(@Header("hx-request") Boolean htmx, Context requestContext) {
+    public String index(@Header("hx-request") Boolean htmx, Context javalinContext) {
         try (var scope = new StructuredTaskScope<>()) {
             var weather = scope.fork(openWeatherClient::getWeather);
             var roomsAndSensors = scope.fork(roomService::getRoomsAndSensors);
             scope.join();
             var sensors = roomsAndSensors.get().sensors();
             var roomViews = roomsAndSensors.get().rooms();
-            return withLayout(htmx, "", "index", templates.index(roomViews, weather.get(), sensors), requestContext);
+            var req = new UIRequestContext("", "index", contextPath);
+            return withLayout(htmx, req, templates.index(req, roomViews, weather.get(), sensors), javalinContext);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -62,20 +67,21 @@ public class UIController {
 
     @Get("/room/{room}")
     @Produces(MediaType.TEXT_HTML)
-    public String room(String room, @Header("hx-request") Boolean htmx, Context requestContext) {
+    public String room(String room, @Header("hx-request") Boolean htmx, Context javalinContext) {
 
         var status = roomService.getRoom(room);
         if (status.isPresent()) {
-            return withLayout(htmx, room, "room", templates.room(KumoJsClient.MODES, status.get()), requestContext);
+            var req = new UIRequestContext(room, "room", contextPath);
+            return withLayout(htmx, req, templates.room(req, KumoJsClient.MODES, status.get()), javalinContext);
         }
-        requestContext.status(HttpStatus.NOT_FOUND);
+        javalinContext.status(HttpStatus.NOT_FOUND);
         return "";
     }
 
     @Post("/room/{room}")
     @Form
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public void updateRoom(String room, String mode, @Nullable String setting, Context requestContext) {
+    public void updateRoom(String room, String mode, @Nullable String setting, Context javalinContext) {
 
         var modeE = Mode.valueOf(mode);
         var action = TemperatureSettingAction.NONE;
@@ -86,16 +92,15 @@ public class UIController {
             action = TemperatureSettingAction.DECREMENT;
         }
         roomService.updateRoom(room, modeE, action);
-        requestContext.redirect("/room/" + room, HttpStatus.SEE_OTHER);
+        javalinContext.redirect("/room/" + room, HttpStatus.SEE_OTHER);
     }
 
-    String withLayout(
-            @Nullable Boolean htmx, String title, String rootClass, JteModel content, Context requestContext) {
-        requestContext.contentType(ContentType.TEXT_HTML);
+    String withLayout(@Nullable Boolean htmx, UIRequestContext req, JteModel content, Context javalinContext) {
+        javalinContext.contentType(ContentType.TEXT_HTML);
         if (htmx != null && htmx) {
             return writable(content);
         } else {
-            return writable(templates.layout(title, rootClass, content));
+            return writable(templates.layout(req, content));
         }
     }
 

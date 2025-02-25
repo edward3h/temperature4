@@ -40,7 +40,7 @@ public class FactoryForAllTheThings {
     }
 
     private void requestTiming(RequestListener.Event event) {
-        requestTimingLogger.info("{}: {}ms", event.uri().getPath(), event.responseTimeMicros() / 1000);
+        requestTimingLogger.info("{}: {}ms", event.uri(), event.responseTimeMicros() / 1000);
     }
 
     @Bean

@@ -1,6 +1,8 @@
 @import java.util.List
 @import org.ethelred.temperature4.RoomView
+@import org.ethelred.temperature4.UIRequestContext
 
+@param UIRequestContext req
 @param List<String> modeOptions
 @param RoomView room
 
@@ -18,5 +20,5 @@
         <button name="setting" value="plus">+</button>
     </div>
 </form>
-<div><a href="/">Back</a></div>
+<div><a href="${req.contextPath()}">Back</a></div>
 
