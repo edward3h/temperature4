@@ -1,6 +1,7 @@
 // (C) Edward Harman 2025
 package org.ethelred.temperature4;
 
+import io.avaje.config.Configuration;
 import io.avaje.inject.BeanScope;
 import io.avaje.inject.spi.GenericType;
 import io.javalin.Javalin;
@@ -13,8 +14,10 @@ public class Main {
         BeanScope bs = BeanScope.builder().build();
         var updater = bs.get(SettingUpdater.class);
         updater.start();
+        var configuration = bs.get(Configuration.class);
         List<Plugin<Void>> services = bs.list(new GenericType<Plugin<Void>>() {});
         Javalin.create(cfg -> {
+                    cfg.router.contextPath = configuration.get("server.contextPath", "/");
                     services.forEach(cfg::registerPlugin);
                     cfg.staticFiles.add("/static", Location.CLASSPATH);
                 })
