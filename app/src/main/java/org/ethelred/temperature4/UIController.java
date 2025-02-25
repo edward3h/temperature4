@@ -46,7 +46,11 @@ public class UIController {
         this.roomService = roomService;
         this.sensorMapping = sensorMapping;
         this.settingRepository = settingRepository;
-        this.contextPath = configuration.get("server.contextPath", "/");
+        var configuredContextPath = configuration.get("server.contextPath", "/");
+        if (!configuredContextPath.endsWith("/")) {
+            configuredContextPath = configuredContextPath + "/";
+        }
+        this.contextPath = configuredContextPath;
     }
 
     @Get("/")
