@@ -1,6 +1,7 @@
 // (C) Edward Harman 2025
 package org.ethelred.temperature4;
 
+import io.avaje.inject.RequiresProperty;
 import jakarta.inject.Singleton;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -11,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
+@RequiresProperty(value = "server.enableUpdate", equalTo = "true")
 public class DefaultSettingUpdater implements SettingUpdater {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultSettingUpdater.class);
     private static final int MAX_TEMP_SETTING = 85;
