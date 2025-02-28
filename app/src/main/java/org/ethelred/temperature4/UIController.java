@@ -16,8 +16,7 @@ import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
 import java.util.concurrent.StructuredTaskScope;
 import org.ethelred.temperature4.kumojs.KumoJsClient;
-import org.ethelred.temperature4.openweather.OpenWeatherClient;
-import org.ethelred.temperature4.sensors.SensorsClient;
+import org.ethelred.temperature4.openweather.OpenWeatherRepository;
 import org.ethelred.temperature4.template.Templates;
 import org.jspecify.annotations.Nullable;
 
@@ -25,27 +24,17 @@ import org.jspecify.annotations.Nullable;
 public class UIController {
     private final String contextPath;
     private final Templates templates;
-    private final KumoJsClient kumoJsClient;
-    private final OpenWeatherClient openWeatherClient;
-    private final SettingRepository settingRepository;
+    private final OpenWeatherRepository openWeatherClient;
     private final RoomService roomService;
-    private final SensorMapping sensorMapping;
 
     public UIController(
             Configuration configuration,
             Templates templates,
-            KumoJsClient kumoJsClient,
-            OpenWeatherClient openWeatherClient,
-            SensorsClient sensorsClient,
-            SettingRepository settingRepository,
-            RoomService roomService,
-            SensorMapping sensorMapping) {
+            OpenWeatherRepository openWeatherRepository,
+            RoomService roomService) {
         this.templates = templates;
-        this.kumoJsClient = kumoJsClient;
-        this.openWeatherClient = openWeatherClient;
+        this.openWeatherClient = openWeatherRepository;
         this.roomService = roomService;
-        this.sensorMapping = sensorMapping;
-        this.settingRepository = settingRepository;
         var configuredContextPath = configuration.get("server.contextPath", "/");
         if (!configuredContextPath.endsWith("/")) {
             configuredContextPath = configuredContextPath + "/";

@@ -2,43 +2,53 @@
 package org.ethelred.temperature4;
 
 import jakarta.inject.Singleton;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.StructuredTaskScope;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.ethelred.temperature4.kumojs.KumoJsClient;
+import org.ethelred.temperature4.kumojs.KumoJsRepository;
+import org.ethelred.temperature4.kumojs.NamedRoomStatus;
+import org.ethelred.temperature4.kumojs.RoomStatus;
 import org.ethelred.temperature4.sensors.SensorsClient;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Singleton
 public class DefaultRoomService implements RoomService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultRoomService.class);
     private final KumoJsClient kumoJsClient;
     private final SensorsClient sensorsClient;
     private final SettingRepository settingRepository;
     private final SensorMapping sensorMapping;
-    private final RoomCombiner roomCombiner;
     private final SettingUpdater settingUpdater;
+    private final KumoJsRepository kumoJsRepository;
 
     public DefaultRoomService(
             KumoJsClient kumoJsClient,
             SensorsClient sensorsClient,
             SettingRepository settingRepository,
             SensorMapping sensorMapping,
-            RoomCombiner roomCombiner,
-            SettingUpdater settingUpdater) {
+            SettingUpdater settingUpdater,
+            KumoJsRepository kumoJsRepository) {
         this.kumoJsClient = kumoJsClient;
         this.sensorsClient = sensorsClient;
         this.settingRepository = settingRepository;
         this.sensorMapping = sensorMapping;
-        this.roomCombiner = roomCombiner;
         this.settingUpdater = settingUpdater;
+        this.kumoJsRepository = kumoJsRepository;
     }
 
     @Override
     public RoomsAndSensors getRoomsAndSensors() {
         try (var scope = new StructuredTaskScope<>()) {
-            var roomStatuses = scope.fork(kumoJsClient::getRoomStatuses);
+            var roomStatuses = scope.fork(kumoJsRepository::getRoomStatuses);
             var sensorResults = scope.fork(() -> sensorMapping.allChannels(sensorsClient.getSensorResults()));
             var settings = scope.fork(settingRepository::findAll);
             scope.join();
-            return roomCombiner.combine(new RoomsAndSensors(roomStatuses.get(), sensorResults.get()), settings.get());
+            return combine(new RoomsAndSensors(roomStatuses.get(), sensorResults.get()), settings.get());
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -52,7 +62,7 @@ public class DefaultRoomService implements RoomService {
         var roomStatus = kumoJsClient.getRoomStatus(name);
         var sensorResult = sensorMapping.channelForRoom(name, sensorsClient.getSensorResults());
         var setting = settingRepository.findByRoom(name);
-        return Optional.of(roomCombiner.combine(name, roomStatus, sensorResult, setting));
+        return Optional.of(combine(name, roomStatus, sensorResult, setting));
     }
 
     @Override
@@ -65,11 +75,70 @@ public class DefaultRoomService implements RoomService {
             var newTemp = action.apply(currentTemp);
             if (sensorMapping.hasSensor(name)) {
                 settingRepository.update(new Setting(name, newTemp, mode));
-                settingUpdater.checkForUpdates();
+                Thread.ofVirtual().start(settingUpdater::checkForUpdates);
             } else {
                 kumoJsClient.setMode(name, mode.toString());
                 kumoJsClient.setTemperature(name, mode.toString(), newTemp);
             }
+        }
+    }
+
+    public RoomsAndSensors combine(RoomsAndSensors roomsAndSensors, Iterable<Setting> settings) {
+        var sensorsByName =
+                roomsAndSensors.sensors().stream().collect(Collectors.toMap(SensorView::name, Function.identity()));
+        var settingByName = Util.mapBy(settings, Setting::room);
+        var rooms = roomsAndSensors.rooms().stream()
+                .map(room -> combineRoom(room, sensorsByName, settingByName.get(room.name())))
+                .toList();
+        return new RoomsAndSensors(rooms, roomsAndSensors.sensors());
+    }
+
+    public RoomView combine(String name, RoomStatus room, SensorView sensorView, Setting setting) {
+        return combineRoom(new NamedRoomStatus(name, room), Map.of(name, sensorView), setting)
+                .get();
+    }
+
+    private NamedResult<RoomView> combineRoom(
+            NamedResult<RoomView> room, Map<String, SensorView> sensorView, Setting setting) {
+        LOGGER.debug("combineRoom {} {}", room, sensorView);
+        if (room.success()) {
+            return new CombinedRoom(room.get(), sensorView.get(room.name()), setting);
+        }
+        return room;
+    }
+
+    private record CombinedRoom(RoomView room, @Nullable SensorView sensorView, @Nullable Setting setting)
+            implements RoomView {
+        @Override
+        public String name() {
+            return room.name();
+        }
+
+        @Override
+        public String roomTemp() {
+            if (sensorView == null) {
+                return room.roomTemp();
+            }
+            return """
+                    %s <span class="ago">(%s)</span>
+                    """
+                    .formatted(sensorView.temperature().display(), room.roomTemp());
+        }
+
+        @Override
+        public String mode() {
+            return room.mode();
+        }
+
+        @Override
+        public String displaySetting() {
+            if (setting == null) {
+                return room.displaySetting();
+            }
+            return """
+                    %s <span class="ago">(%s)</span>
+                    """
+                    .formatted(setting.settingFahrenheit(), room.displaySetting());
         }
     }
 }

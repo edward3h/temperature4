@@ -65,31 +65,34 @@ public class DefaultSettingUpdater implements SettingUpdater {
     }
 
     private void checkForUpdate(Setting setting, SensorView sensorResult) {
-        var roomStatus = kumoJsClient.getRoomStatus(setting.room());
-        var kumoMode = Mode.valueOf(roomStatus.mode());
-        if (setting.mode() != kumoMode) {
-            kumoJsClient.setMode(setting.room(), setting.mode().toString());
-            LOGGER.info("Set mode {} for {}", setting.mode(), setting.room());
+        try {
+            var roomStatus = kumoJsClient.getRoomStatus(setting.room());
+            var kumoMode = Mode.valueOf(roomStatus.mode());
+            if (setting.mode() != kumoMode) {
+                kumoJsClient.setMode(setting.room(), setting.mode().toString());
+                LOGGER.info("Set mode {} for {}", setting.mode(), setting.room());
+            }
+            var kumoTemp = roomStatus.sp();
+            var settingTemp = setting.settingFahrenheit();
+            var sensorTemp = sensorResult.temperature().fahrenheit();
+            if (sensorTemp < settingTemp && kumoTemp < MAX_TEMP_SETTING) {
+                setTemperature(setting, sensorTemp, kumoTemp + 1);
+            } else if (sensorTemp > settingTemp && kumoTemp > MIN_TEMP_SETTING) {
+                setTemperature(setting, sensorTemp, kumoTemp - 1);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Unhandled exception", e);
         }
-        var kumoTemp = roomStatus.sp();
-        var settingTemp = setting.settingFahrenheit();
-        var sensorTemp = sensorResult.temperature().fahrenheit();
-        if (sensorTemp < settingTemp && kumoTemp < MAX_TEMP_SETTING) {
-            kumoJsClient.setTemperature(setting.room(), setting.mode().toString(), kumoTemp + 1);
-            LOGGER.info(
-                    "Update temp for room {}. Setting {}, sensor {}, kumo {}",
-                    setting.room(),
-                    settingTemp,
-                    sensorTemp,
-                    kumoTemp + 1);
-        } else if (sensorTemp > settingTemp && kumoTemp > MIN_TEMP_SETTING) {
-            kumoJsClient.setTemperature(setting.room(), setting.mode().toString(), kumoTemp - 1);
-            LOGGER.info(
-                    "Update temp for room {}. Setting {}, sensor {}, kumo {}",
-                    setting.room(),
-                    settingTemp,
-                    sensorTemp,
-                    kumoTemp - 1);
-        }
+    }
+
+    private void setTemperature(Setting setting, double sensorTemp, int newKumoTemp) {
+
+        kumoJsClient.setTemperature(setting.room(), setting.mode().toString(), newKumoTemp);
+        LOGGER.info(
+                "Update temp for room {}. Setting {}, sensor {}, kumo {}",
+                setting.room(),
+                setting.settingFahrenheit(),
+                sensorTemp,
+                newKumoTemp);
     }
 }
