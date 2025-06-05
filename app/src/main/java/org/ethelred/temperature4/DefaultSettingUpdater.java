@@ -72,6 +72,10 @@ public class DefaultSettingUpdater implements SettingUpdater {
                 kumoJsClient.setMode(setting.room(), setting.mode().toString());
                 LOGGER.info("Set mode {} for {}", setting.mode(), setting.room());
             }
+            if (setting.mode() == Mode.off) {
+                // no temperature in "off" mode!
+                return;
+            }
             var kumoTemp = roomStatus.sp();
             var settingTemp = setting.settingFahrenheit();
             var sensorTemp = sensorResult.temperature().fahrenheit();

@@ -93,9 +93,12 @@ public class DefaultRoomService implements RoomService {
         return new RoomsAndSensors(rooms, roomsAndSensors.sensors());
     }
 
-    public RoomView combine(String name, RoomStatus room, SensorView sensorView, Setting setting) {
-        return combineRoom(new NamedRoomStatus(name, room), Map.of(name, sensorView), setting)
-                .get();
+    public RoomView combine(String name, RoomStatus room, @Nullable SensorView sensorView, @Nullable Setting setting) {
+        NamedRoomStatus roomStatus = new NamedRoomStatus(name, room);
+        if (sensorView == null || setting == null) {
+            return roomStatus;
+        }
+        return combineRoom(roomStatus, Map.of(name, sensorView), setting).get();
     }
 
     private NamedResult<RoomView> combineRoom(
