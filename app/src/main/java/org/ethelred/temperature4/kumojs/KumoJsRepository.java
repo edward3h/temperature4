@@ -37,13 +37,26 @@ public class KumoJsRepository {
         return Objects.requireNonNull(roomListCache.get(ROOM_LIST_KEY, x -> client.getRoomList()));
     }
 
+    record RoomTask(String room, StructuredTaskScope.Subtask<NamedResult<RoomView>> task) {
+        private NamedResult<RoomView> result() {
+            return switch (task.state()) {
+                case SUCCESS -> task.get();
+                case FAILED -> {
+                    LOGGER.error("While getting room {}", room, task.exception());
+                    yield new ErrorNamedResult<>(room, task.exception());
+                }
+                case UNAVAILABLE -> new ErrorNamedResult<>(room, "Result unavailable");
+            };
+        }
+    }
+
     private List<NamedResult<RoomView>> namedRoomStatuses(List<String> rooms) {
         try (var scope = new StructuredTaskScope<NamedResult<RoomView>>()) {
             var tasks = rooms.stream()
-                    .map(r -> scope.fork(() -> namedRoomStatus(r)))
+                    .map(r -> new RoomTask(r, scope.fork(() -> namedRoomStatus(r))))
                     .toList();
             scope.join();
-            return tasks.stream().map(StructuredTaskScope.Subtask::get).toList();
+            return tasks.stream().map(RoomTask::result).toList();
         } catch (InterruptedException e) {
             return List.of();
         }
