@@ -7,6 +7,7 @@ import io.avaje.config.Configuration;
 import jakarta.inject.Singleton;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Executors;
 import java.util.concurrent.StructuredTaskScope;
 import java.util.concurrent.TimeUnit;
 import org.ethelred.temperature4.ErrorNamedResult;
@@ -26,9 +27,11 @@ public class KumoJsRepository {
     public KumoJsRepository(Configuration configuration, KumoJsClient client) {
         this.client = client;
         this.roomListCache = Caffeine.newBuilder()
+                .executor(Executors.newVirtualThreadPerTaskExecutor())
                 .expireAfterWrite(configuration.getLong("cache.roomlist.minutes", 15L), TimeUnit.MINUTES)
                 .build();
         this.roomStatusCache = Caffeine.newBuilder()
+                .executor(Executors.newVirtualThreadPerTaskExecutor())
                 .expireAfterWrite(configuration.getLong("cache.roomstatus.minutes", 4L), TimeUnit.MINUTES)
                 .build();
     }

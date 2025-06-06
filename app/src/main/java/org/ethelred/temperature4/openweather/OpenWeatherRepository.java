@@ -5,6 +5,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import jakarta.inject.Singleton;
 import java.util.Objects;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @Singleton
@@ -13,8 +14,10 @@ public class OpenWeatherRepository {
     private final LoadingCache<Object, OpenWeatherResult> weatherResultCache;
 
     public OpenWeatherRepository(OpenWeatherClient client) {
-        this.weatherResultCache =
-                Caffeine.newBuilder().expireAfterWrite(15, TimeUnit.MINUTES).build(x -> client.getWeather());
+        this.weatherResultCache = Caffeine.newBuilder()
+                .executor(Executors.newVirtualThreadPerTaskExecutor())
+                .expireAfterWrite(15, TimeUnit.MINUTES)
+                .build(x -> client.getWeather());
     }
 
     public OpenWeatherResult getWeather() {
