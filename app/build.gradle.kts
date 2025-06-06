@@ -13,7 +13,7 @@ repositories {
 dependencies {
     annotationProcessor("io.avaje:avaje-inject-generator:11.5")
     annotationProcessor("io.avaje:avaje-http-javalin-generator:3.0")
-    annotationProcessor("io.avaje:avaje-http-client-generator:3.0")
+    annotationProcessor("io.avaje:avaje-http-client-generator:3.3")
     annotationProcessor("io.avaje:avaje-jsonb-generator:3.5")
     annotationProcessor("io.soabase.record-builder:record-builder-processor:44")
     compileOnly("io.soabase.record-builder:record-builder-core:44")
