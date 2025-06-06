@@ -7,11 +7,10 @@ import java.util.Optional;
 import java.util.concurrent.StructuredTaskScope;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.ethelred.temperature4.kumojs.KumoJsClient;
 import org.ethelred.temperature4.kumojs.KumoJsRepository;
 import org.ethelred.temperature4.kumojs.NamedRoomStatus;
 import org.ethelred.temperature4.kumojs.RoomStatus;
-import org.ethelred.temperature4.sensors.SensorsClient;
+import org.ethelred.temperature4.sensors.SensorsRepository;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,21 +18,18 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class DefaultRoomService implements RoomService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultRoomService.class);
-    private final KumoJsClient kumoJsClient;
-    private final SensorsClient sensorsClient;
+    private final SensorsRepository sensorsClient;
     private final SettingRepository settingRepository;
     private final SensorMapping sensorMapping;
     private final SettingUpdater settingUpdater;
     private final KumoJsRepository kumoJsRepository;
 
     public DefaultRoomService(
-            KumoJsClient kumoJsClient,
-            SensorsClient sensorsClient,
+            SensorsRepository sensorsClient,
             SettingRepository settingRepository,
             SensorMapping sensorMapping,
             SettingUpdater settingUpdater,
             KumoJsRepository kumoJsRepository) {
-        this.kumoJsClient = kumoJsClient;
         this.sensorsClient = sensorsClient;
         this.settingRepository = settingRepository;
         this.sensorMapping = sensorMapping;
@@ -56,10 +52,10 @@ public class DefaultRoomService implements RoomService {
 
     @Override
     public Optional<RoomView> getRoom(String name) {
-        if (!kumoJsClient.getRoomList().contains(name)) {
+        if (!kumoJsRepository.getRoomList().contains(name)) {
             return Optional.empty();
         }
-        var roomStatus = kumoJsClient.getRoomStatus(name);
+        var roomStatus = kumoJsRepository.getRoomStatus(name);
         var sensorResult = sensorMapping.channelForRoom(name, sensorsClient.getSensorResults());
         var setting = settingRepository.findByRoom(name);
         return Optional.of(combine(name, roomStatus, sensorResult, setting));
@@ -67,7 +63,7 @@ public class DefaultRoomService implements RoomService {
 
     @Override
     public void updateRoom(String name, Mode mode, TemperatureSettingAction action) {
-        var roomStatus = kumoJsClient.getRoomStatus(name);
+        var roomStatus = kumoJsRepository.getRoomStatus(name);
         var setting = settingRepository.findByRoom(name);
         var currentMode = setting == null ? Mode.valueOf(roomStatus.mode()) : setting.mode();
         var currentTemp = setting == null ? roomStatus.sp() : setting.settingFahrenheit();
@@ -77,8 +73,8 @@ public class DefaultRoomService implements RoomService {
                 settingRepository.update(new Setting(name, newTemp, mode));
                 Thread.ofVirtual().start(settingUpdater::checkForUpdates);
             } else {
-                kumoJsClient.setMode(name, mode.toString());
-                kumoJsClient.setTemperature(name, mode.toString(), newTemp);
+                kumoJsRepository.setMode(name, mode.toString());
+                kumoJsRepository.setTemperature(name, mode.toString(), newTemp);
             }
         }
     }

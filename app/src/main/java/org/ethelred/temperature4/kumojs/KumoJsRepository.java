@@ -20,6 +20,7 @@ public class KumoJsRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(KumoJsRepository.class);
     private final Object ROOM_LIST_KEY = new Object();
     private final Cache<Object, List<String>> roomListCache;
+    private final Cache<String, RoomStatus> roomStatusCache;
     private final KumoJsClient client;
 
     public KumoJsRepository(Configuration configuration, KumoJsClient client) {
@@ -27,14 +28,31 @@ public class KumoJsRepository {
         this.roomListCache = Caffeine.newBuilder()
                 .expireAfterWrite(configuration.getLong("cache.roomlist.minutes", 15L), TimeUnit.MINUTES)
                 .build();
+        this.roomStatusCache = Caffeine.newBuilder()
+                .expireAfterWrite(configuration.getLong("cache.roomstatus.minutes", 4L), TimeUnit.MINUTES)
+                .build();
     }
 
     public List<NamedResult<RoomView>> getRoomStatuses() {
         return namedRoomStatuses(getRoomList());
     }
 
-    private List<String> getRoomList() {
+    public List<String> getRoomList() {
         return Objects.requireNonNull(roomListCache.get(ROOM_LIST_KEY, x -> client.getRoomList()));
+    }
+
+    public RoomStatus getRoomStatus(String name) {
+        return Objects.requireNonNull(roomStatusCache.get(name, client::getRoomStatus));
+    }
+
+    public void setMode(String name, String mode) {
+        client.setMode(name, mode);
+        roomStatusCache.invalidate(name);
+    }
+
+    public void setTemperature(String name, String mode, int newTemp) {
+        client.setTemperature(name, mode, newTemp);
+        roomStatusCache.invalidate(name);
     }
 
     record RoomTask(String room, StructuredTaskScope.Subtask<NamedResult<RoomView>> task) {
@@ -64,7 +82,7 @@ public class KumoJsRepository {
 
     private NamedResult<RoomView> namedRoomStatus(String room) {
         try {
-            return new NamedRoomStatus(room, client.getRoomStatus(room));
+            return new NamedRoomStatus(room, getRoomStatus(room));
         } catch (Exception e) {
             LOGGER.error("While getting room {}", room, e);
             return new ErrorNamedResult<>(room, e.getMessage());

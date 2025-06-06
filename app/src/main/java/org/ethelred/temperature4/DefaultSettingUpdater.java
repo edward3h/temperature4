@@ -7,8 +7,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.StructuredTaskScope;
 import java.util.concurrent.TimeUnit;
-import org.ethelred.temperature4.kumojs.KumoJsClient;
-import org.ethelred.temperature4.sensors.SensorsClient;
+import org.ethelred.temperature4.kumojs.KumoJsRepository;
+import org.ethelred.temperature4.sensors.SensorsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,14 +20,14 @@ public class DefaultSettingUpdater implements SettingUpdater {
     private static final int MIN_TEMP_SETTING = 62;
     private final ScheduledExecutorService executorService;
     private final SettingRepository settingRepository;
-    private final KumoJsClient kumoJsClient;
-    private final SensorsClient sensorsClient;
+    private final KumoJsRepository kumoJsClient;
+    private final SensorsRepository sensorsClient;
     private final SensorMapping sensorMapping;
 
     public DefaultSettingUpdater(
             SettingRepository settingRepository,
-            KumoJsClient kumoJsClient,
-            SensorsClient sensorsClient,
+            KumoJsRepository kumoJsClient,
+            SensorsRepository sensorsClient,
             SensorMapping sensorMapping) {
         this.settingRepository = settingRepository;
         this.kumoJsClient = kumoJsClient;
