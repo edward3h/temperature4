@@ -21,6 +21,6 @@ public class Main {
                     services.forEach(cfg::registerPlugin);
                     cfg.staticFiles.add("/static", Location.CLASSPATH);
                 })
-                .start();
+                .start(configuration.getInt("server.port", 8080));
     }
 }
