@@ -37,14 +37,17 @@ public class KumoJsRepository {
     }
 
     public List<NamedResult<RoomView>> getRoomStatuses() {
+        LOGGER.debug("getRoomStatuses");
         return namedRoomStatuses(getRoomList());
     }
 
     public List<String> getRoomList() {
+        LOGGER.debug("getRoomList");
         return Objects.requireNonNull(roomListCache.get(ROOM_LIST_KEY, x -> client.getRoomList()));
     }
 
     public RoomStatus getRoomStatus(String name) {
+        LOGGER.debug("getRoomStatus {}", name);
         return Objects.requireNonNull(roomStatusCache.get(name, client::getRoomStatus));
     }
 

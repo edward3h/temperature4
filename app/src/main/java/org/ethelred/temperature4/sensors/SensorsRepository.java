@@ -9,9 +9,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Singleton
 public class SensorsRepository {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SensorsRepository.class);
+
     private final SensorsClient client;
     private final Object RESULT_KEY = new Object();
     private final Cache<Object, List<SensorResult>> cache;
@@ -25,6 +29,7 @@ public class SensorsRepository {
     }
 
     public List<SensorResult> getSensorResults() {
+        LOGGER.debug("getSensorResults");
         return Objects.requireNonNull(cache.get(RESULT_KEY, x -> client.getSensorResults()));
     }
 }

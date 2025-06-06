@@ -7,9 +7,13 @@ import jakarta.inject.Singleton;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Singleton
 public class OpenWeatherRepository {
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenWeatherRepository.class);
+
     private final Object WEATHER_KEY = new Object();
     private final LoadingCache<Object, OpenWeatherResult> weatherResultCache;
 
@@ -21,6 +25,7 @@ public class OpenWeatherRepository {
     }
 
     public OpenWeatherResult getWeather() {
+        LOGGER.debug("getWeather");
         return Objects.requireNonNull(weatherResultCache.get(WEATHER_KEY));
     }
 }
