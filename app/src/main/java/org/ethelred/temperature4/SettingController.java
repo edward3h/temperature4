@@ -1,9 +1,9 @@
+// (C) Edward Harman 2025
 package org.ethelred.temperature4;
 
 import io.avaje.http.api.Controller;
 import io.avaje.http.api.Get;
 import io.avaje.http.api.Post;
-
 import java.util.List;
 
 @Controller("/api/settings")
