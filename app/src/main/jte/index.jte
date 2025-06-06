@@ -9,7 +9,7 @@
 
 @param UIRequestContext req
 @param List<NamedResult<RoomView>> rooms
-@param OpenWeatherResult weather
+@param NamedResult<OpenWeatherResult> weatherResult
 @param List<SensorView> sensors
 
 !{var now = OffsetDateTime.now();}
@@ -24,12 +24,17 @@
     @endfor
 </table>
 <h2>Weather</h2>
+@if(weatherResult.success())
+    !{var weather = weatherResult.get();}
 <table class="weather"><tr>
     <td>${weather.current().temp().display()}</td>
     <td>$unsafe{weather.minMax()}</td>
     <td>${weather.summary()}</td>
     </tr>
 </table>
+@elseif(weatherResult instanceof ErrorNamedResult<OpenWeatherResult> error)
+    <div>${error.message()}</div>
+@endif
 <h2>Sensors</h2>
 <table>
     <tr><th>#</th><th>Name</th><th>Current</th><th class="ago">Battery</th><th class="ago">Last Reading</th></tr>

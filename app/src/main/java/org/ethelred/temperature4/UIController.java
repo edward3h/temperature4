@@ -52,10 +52,20 @@ public class UIController {
             var sensors = roomsAndSensors.get().sensors();
             var roomViews = roomsAndSensors.get().rooms();
             var req = new UIRequestContext("", "index", contextPath);
-            return withLayout(htmx, req, templates.index(req, roomViews, weather.get(), sensors), javalinContext);
+            return withLayout(htmx, req, templates.index(req, roomViews, orError(weather), sensors), javalinContext);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private <T> NamedResult<T> orError(StructuredTaskScope.Subtask<T> result) {
+        if (result.state() == StructuredTaskScope.Subtask.State.SUCCESS) {
+            return new SuccessNamedResult<>("", result.get());
+
+        } else if (result.state() == StructuredTaskScope.Subtask.State.FAILED) {
+            return new ErrorNamedResult<>("", result.exception());
+        }
+        return new ErrorNamedResult<>("", "Result unavailable");
     }
 
     @Get("/room/{room}")
