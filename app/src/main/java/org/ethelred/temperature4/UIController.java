@@ -14,7 +14,6 @@ import io.avaje.http.api.Produces;
 import io.javalin.http.ContentType;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
-import java.util.concurrent.StructuredTaskScope;
 import org.ethelred.temperature4.kumojs.KumoJsClient;
 import org.ethelred.temperature4.openweather.OpenWeatherRepository;
 import org.ethelred.temperature4.template.Templates;
@@ -45,27 +44,12 @@ public class UIController {
     @Get("/")
     @Produces(MediaType.TEXT_HTML)
     public String index(@Header("hx-request") Boolean htmx, Context javalinContext) {
-        try (var scope = new StructuredTaskScope<>()) {
-            var weather = scope.fork(openWeatherClient::getWeather);
-            var roomsAndSensors = scope.fork(roomService::getRoomsAndSensors);
-            scope.join();
-            var sensors = roomsAndSensors.get().sensors();
-            var roomViews = roomsAndSensors.get().rooms();
-            var req = new UIRequestContext("", "index", contextPath);
-            return withLayout(htmx, req, templates.index(req, roomViews, orError(weather), sensors), javalinContext);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private <T> NamedResult<T> orError(StructuredTaskScope.Subtask<T> result) {
-        if (result.state() == StructuredTaskScope.Subtask.State.SUCCESS) {
-            return new SuccessNamedResult<>("", result.get());
-
-        } else if (result.state() == StructuredTaskScope.Subtask.State.FAILED) {
-            return new ErrorNamedResult<>("", result.exception());
-        }
-        return new ErrorNamedResult<>("", "Result unavailable");
+        var weather = openWeatherClient.getWeather();
+        var roomsAndSensors = roomService.getRoomsAndSensors();
+        var sensors = roomsAndSensors.sensors();
+        var roomViews = roomsAndSensors.rooms();
+        var req = new UIRequestContext("", "index", contextPath);
+        return withLayout(htmx, req, templates.index(req, roomViews, weather, sensors), javalinContext);
     }
 
     @Get("/room/{room}")

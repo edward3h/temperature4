@@ -8,10 +8,7 @@ import jakarta.inject.Singleton;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.StructuredTaskScope;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import org.ethelred.temperature4.ErrorNamedResult;
 import org.ethelred.temperature4.NamedResult;
 import org.ethelred.temperature4.RoomView;
@@ -25,7 +22,6 @@ public class KumoJsRepository {
     private final Cache<Object, List<String>> roomListCache;
     private final Cache<String, RoomStatus> roomStatusCache;
     private final KumoJsClient client;
-    private final Semaphore help;
 
     public KumoJsRepository(Configuration configuration, KumoJsClient client) {
         this.client = client;
@@ -37,31 +33,6 @@ public class KumoJsRepository {
                 .executor(Executors.newVirtualThreadPerTaskExecutor())
                 .expireAfterWrite(configuration.getLong("cache.roomstatus.minutes", 4L), TimeUnit.MINUTES)
                 .build();
-        this.help = new Semaphore(1);
-    }
-
-    private <I, O> Function<I, O> serialize(Function<I, O> inner) {
-        return input -> {
-            try {
-                help.acquire();
-                return inner.apply(input);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            } finally {
-                help.release();
-            }
-        };
-    }
-
-    private void serialize(Runnable runnable) {
-        try {
-            help.acquire();
-            runnable.run();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } finally {
-            help.release();
-        }
     }
 
     public List<NamedResult<RoomView>> getRoomStatuses() {
@@ -71,47 +42,26 @@ public class KumoJsRepository {
 
     public List<String> getRoomList() {
         LOGGER.debug("getRoomList");
-        return Objects.requireNonNull(roomListCache.get(ROOM_LIST_KEY, serialize(x -> client.getRoomList())));
+        return Objects.requireNonNull(roomListCache.get(ROOM_LIST_KEY, x -> client.getRoomList()));
     }
 
     public RoomStatus getRoomStatus(String name) {
         LOGGER.debug("getRoomStatus {}", name);
-        return Objects.requireNonNull(roomStatusCache.get(name, serialize(client::getRoomStatus)));
+        return Objects.requireNonNull(roomStatusCache.get(name, client::getRoomStatus));
     }
 
     public void setMode(String name, String mode) {
-        serialize(() -> client.setMode(name, mode));
+        client.setMode(name, mode);
         roomStatusCache.invalidate(name);
     }
 
     public void setTemperature(String name, String mode, int newTemp) {
-        serialize(() -> client.setTemperature(name, mode, newTemp));
+        client.setTemperature(name, mode, newTemp);
         roomStatusCache.invalidate(name);
     }
 
-    record RoomTask(String room, StructuredTaskScope.Subtask<NamedResult<RoomView>> task) {
-        private NamedResult<RoomView> result() {
-            return switch (task.state()) {
-                case SUCCESS -> task.get();
-                case FAILED -> {
-                    LOGGER.error("While getting room {}", room, task.exception());
-                    yield new ErrorNamedResult<>(room, task.exception());
-                }
-                case UNAVAILABLE -> new ErrorNamedResult<>(room, "Result unavailable");
-            };
-        }
-    }
-
     private List<NamedResult<RoomView>> namedRoomStatuses(List<String> rooms) {
-        try (var scope = new StructuredTaskScope<NamedResult<RoomView>>()) {
-            var tasks = rooms.stream()
-                    .map(r -> new RoomTask(r, scope.fork(() -> namedRoomStatus(r))))
-                    .toList();
-            scope.join();
-            return tasks.stream().map(RoomTask::result).toList();
-        } catch (InterruptedException e) {
-            return List.of();
-        }
+        return rooms.stream().map(this::namedRoomStatus).toList();
     }
 
     private NamedResult<RoomView> namedRoomStatus(String room) {

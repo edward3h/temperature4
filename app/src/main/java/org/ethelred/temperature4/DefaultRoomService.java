@@ -4,7 +4,6 @@ package org.ethelred.temperature4;
 import jakarta.inject.Singleton;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.StructuredTaskScope;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.ethelred.temperature4.kumojs.KumoJsRepository;
@@ -39,15 +38,10 @@ public class DefaultRoomService implements RoomService {
 
     @Override
     public RoomsAndSensors getRoomsAndSensors() {
-        try (var scope = new StructuredTaskScope<>()) {
-            var roomStatuses = scope.fork(kumoJsRepository::getRoomStatuses);
-            var sensorResults = scope.fork(() -> sensorMapping.allChannels(sensorsClient.getSensorResults()));
-            var settings = scope.fork(settingRepository::findAll);
-            scope.join();
-            return combine(new RoomsAndSensors(roomStatuses.get(), sensorResults.get()), settings.get());
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        var roomStatuses = kumoJsRepository.getRoomStatuses();
+        var sensorResults = sensorMapping.allChannels(sensorsClient.getSensorResults());
+        var settings = settingRepository.findAll();
+        return combine(new RoomsAndSensors(roomStatuses, sensorResults), settings);
     }
 
     @Override

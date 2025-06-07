@@ -5,7 +5,6 @@ import io.avaje.inject.RequiresProperty;
 import jakarta.inject.Singleton;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.StructuredTaskScope;
 import java.util.concurrent.TimeUnit;
 import org.ethelred.temperature4.kumojs.KumoJsRepository;
 import org.ethelred.temperature4.sensors.SensorsRepository;
@@ -48,19 +47,11 @@ public class DefaultSettingUpdater implements SettingUpdater {
             return;
         }
         var sensorResults = sensorsClient.getSensorResults();
-        try (var scope = new StructuredTaskScope<>()) {
-            for (var setting : settings) {
-                scope.fork(() -> {
-                    var sensorResult = sensorMapping.channelForRoom(setting.room(), sensorResults);
-                    if (sensorResult != null) {
-                        checkForUpdate(setting, sensorResult);
-                    }
-                    return null;
-                });
+        for (var setting : settings) {
+            var sensorResult = sensorMapping.channelForRoom(setting.room(), sensorResults);
+            if (sensorResult != null) {
+                checkForUpdate(setting, sensorResult);
             }
-            scope.join();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
         }
     }
 
