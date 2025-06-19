@@ -23,6 +23,9 @@ public class DefaultSettingUpdater implements SettingUpdater {
     private final SensorsRepository sensorsClient;
     private final SensorMapping sensorMapping;
 
+    private long lastUpdateTimeNanos = 0L;
+    private final long UPDATE_DELAY = TimeUnit.MINUTES.toNanos(5L);
+
     public DefaultSettingUpdater(
             SettingRepository settingRepository,
             KumoJsRepository kumoJsClient,
@@ -37,22 +40,38 @@ public class DefaultSettingUpdater implements SettingUpdater {
 
     @Override
     public void start() {
-        executorService.scheduleWithFixedDelay(this::checkForUpdates, 0, 5, TimeUnit.MINUTES);
+        executorService.scheduleWithFixedDelay(() -> checkForUpdates(false), 0, 5, TimeUnit.MINUTES);
     }
 
     @Override
-    public void checkForUpdates() {
-        var settings = settingRepository.findAll();
-        if (settings.isEmpty()) {
+    public void checkForUpdates(boolean immediately) {
+        if (!runNow(immediately)) {
             return;
         }
-        var sensorResults = sensorsClient.getSensorResults();
-        for (var setting : settings) {
-            var sensorResult = sensorMapping.channelForRoom(setting.room(), sensorResults);
-            if (sensorResult != null) {
-                checkForUpdate(setting, sensorResult);
+        try {
+            var settings = settingRepository.findAll();
+            if (settings.isEmpty()) {
+                return;
             }
+            var sensorResults = sensorsClient.getSensorResults();
+            for (var setting : settings) {
+                var sensorResult = sensorMapping.channelForRoom(setting.room(), sensorResults);
+                if (sensorResult != null) {
+                    checkForUpdate(setting, sensorResult);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error("Unhandled exception", e);
         }
+    }
+
+    private synchronized boolean runNow(boolean immediately) {
+        var now = System.nanoTime();
+        if (immediately || now - lastUpdateTimeNanos > UPDATE_DELAY) {
+            lastUpdateTimeNanos = now;
+            return true;
+        }
+        return false;
     }
 
     private void checkForUpdate(Setting setting, SensorView sensorResult) {

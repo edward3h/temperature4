@@ -65,7 +65,7 @@ public class DefaultRoomService implements RoomService {
             var newTemp = action.apply(currentTemp);
             if (sensorMapping.hasSensor(name)) {
                 settingRepository.update(new Setting(name, newTemp, mode));
-                Thread.ofVirtual().start(settingUpdater::checkForUpdates);
+                Thread.ofVirtual().start(() -> settingUpdater.checkForUpdates(true));
             } else {
                 kumoJsRepository.setMode(name, mode.toString());
                 kumoJsRepository.setTemperature(name, mode.toString(), newTemp);

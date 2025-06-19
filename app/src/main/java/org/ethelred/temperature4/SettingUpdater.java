@@ -4,5 +4,5 @@ package org.ethelred.temperature4;
 public interface SettingUpdater {
     void start();
 
-    void checkForUpdates();
+    void checkForUpdates(boolean immediately);
 }

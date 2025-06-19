@@ -11,5 +11,5 @@ public class NoOpSettingUpdater implements SettingUpdater {
     public void start() {}
 
     @Override
-    public void checkForUpdates() {}
+    public void checkForUpdates(boolean ignore) {}
 }

@@ -9,9 +9,11 @@ import java.util.List;
 @Controller("/api/settings")
 public class SettingController {
     private final SettingRepository settingRepository;
+    private final SettingUpdater settingUpdater;
 
-    public SettingController(SettingRepository settingRepository) {
+    public SettingController(SettingRepository settingRepository, SettingUpdater settingUpdater) {
         this.settingRepository = settingRepository;
+        this.settingUpdater = settingUpdater;
     }
 
     @Get
@@ -22,5 +24,10 @@ public class SettingController {
     @Post
     public void update(Setting setting) {
         settingRepository.update(setting);
+    }
+
+    @Post("/checkForUpdates")
+    public void check() {
+        settingUpdater.checkForUpdates(false);
     }
 }
