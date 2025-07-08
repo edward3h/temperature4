@@ -1,6 +1,7 @@
 // (C) Edward Harman 2025
 package org.ethelred.temperature4;
 
+import io.avaje.config.Configuration;
 import io.avaje.inject.RequiresProperty;
 import jakarta.inject.Singleton;
 import java.util.concurrent.Executors;
@@ -15,8 +16,8 @@ import org.slf4j.LoggerFactory;
 @RequiresProperty(value = "server.enableUpdate", equalTo = "true")
 public class DefaultSettingUpdater implements SettingUpdater {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultSettingUpdater.class);
-    private static final int MAX_TEMP_SETTING = 85;
-    private static final int MIN_TEMP_SETTING = 62;
+    private final int MAX_TEMP_SETTING;
+    private final int MIN_TEMP_SETTING;
     private final ScheduledExecutorService executorService;
     private final SettingRepository settingRepository;
     private final KumoJsRepository kumoJsClient;
@@ -27,10 +28,13 @@ public class DefaultSettingUpdater implements SettingUpdater {
     private final long UPDATE_DELAY = TimeUnit.MINUTES.toNanos(5L);
 
     public DefaultSettingUpdater(
+            Configuration configuration,
             SettingRepository settingRepository,
             KumoJsRepository kumoJsClient,
             SensorsRepository sensorsClient,
             SensorMapping sensorMapping) {
+        MAX_TEMP_SETTING = configuration.getInt("updater.maxtemp", 85);
+        MIN_TEMP_SETTING = configuration.getInt("updater.mintemp", 62);
         this.settingRepository = settingRepository;
         this.kumoJsClient = kumoJsClient;
         this.sensorsClient = sensorsClient;

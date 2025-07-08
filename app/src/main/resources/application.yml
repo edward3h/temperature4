@@ -6,3 +6,7 @@ cache:
     minutes: 15
   openweather:
     minutes: 15
+
+updater:
+  mintemp: 59
+  maxtemp: 85
