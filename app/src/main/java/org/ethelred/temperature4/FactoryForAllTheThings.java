@@ -7,6 +7,7 @@ import io.avaje.http.client.HttpClient;
 import io.avaje.http.client.RequestListener;
 import io.avaje.inject.Bean;
 import io.avaje.inject.Factory;
+import java.util.List;
 import java.util.concurrent.Executors;
 import org.ethelred.temperature4.kumojs.KumoJsClient;
 import org.ethelred.temperature4.openweather.OpenWeatherClient;
@@ -55,6 +56,10 @@ public class FactoryForAllTheThings {
 
     @Bean
     public SensorsClient sensorsClient(Configuration configuration) {
-        return client(SensorsClient.class, configuration, "sensors");
+        try {
+            return client(SensorsClient.class, configuration, "sensors");
+        } catch (Exception e) {
+            return List::of;
+        }
     }
 }
