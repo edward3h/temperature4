@@ -5,8 +5,8 @@ import java.util.function.IntUnaryOperator;
 
 public enum TemperatureSettingAction {
     NONE(i -> i),
-    INCREMENT(i -> i + 1),
-    DECREMENT(i -> i - 1);
+    INCREMENT(i -> i + 2),
+    DECREMENT(i -> i - 2);
 
     private final IntUnaryOperator op;
 
