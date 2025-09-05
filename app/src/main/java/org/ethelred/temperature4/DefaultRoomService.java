@@ -58,15 +58,17 @@ public class DefaultRoomService implements RoomService {
     @Override
     public void updateRoom(String name, Mode mode, TemperatureSettingAction action) {
         var roomStatus = kumoJsRepository.getRoomStatus(name);
-        var setting = settingRepository.findByRoom(name);
+        var setting = sensorMapping.hasSensor(name) ? settingRepository.findByRoom(name) : null;
         var currentMode = setting == null ? Mode.valueOf(roomStatus.mode()) : setting.mode();
         var currentTemp = setting == null ? roomStatus.sp() : setting.settingFahrenheit();
         if (mode != currentMode || action != TemperatureSettingAction.NONE) {
             var newTemp = action.apply(currentTemp);
             if (sensorMapping.hasSensor(name)) {
+                LOGGER.info("Setting update: {} {} {}", name, mode, newTemp);
                 settingRepository.update(new Setting(name, newTemp, mode));
                 Thread.ofVirtual().start(() -> settingUpdater.checkForUpdates(true));
             } else {
+                LOGGER.info("Direct update: {} {} {}", name, mode, newTemp);
                 kumoJsRepository.setMode(name, mode.toString());
                 kumoJsRepository.setTemperature(name, mode.toString(), newTemp);
             }
@@ -125,7 +127,7 @@ public class DefaultRoomService implements RoomService {
 
         @Override
         public String displaySetting() {
-            if (setting == null) {
+            if (setting == null || sensorView == null) {
                 return room.displaySetting();
             }
             return """
