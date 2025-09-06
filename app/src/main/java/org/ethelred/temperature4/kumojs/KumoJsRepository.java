@@ -14,6 +14,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.ethelred.temperature4.ErrorNamedResult;
 import org.ethelred.temperature4.NamedResult;
+import org.ethelred.temperature4.NoOpCache;
 import org.ethelred.temperature4.RoomView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,10 +37,13 @@ public class KumoJsRepository {
                 .executor(Executors.newVirtualThreadPerTaskExecutor())
                 .expireAfterWrite(configuration.getLong("cache.roomlist.minutes", 15L), TimeUnit.MINUTES)
                 .build();
-        this.roomStatusCache = Caffeine.newBuilder()
-                .executor(Executors.newVirtualThreadPerTaskExecutor())
-                .expireAfterWrite(configuration.getLong("cache.roomstatus.minutes", 4L), TimeUnit.MINUTES)
-                .build();
+        long roomStatusMinutes = configuration.getLong("cache.roomstatus.minutes", 4L);
+        this.roomStatusCache = roomStatusMinutes > 0L
+                ? Caffeine.newBuilder()
+                        .executor(Executors.newVirtualThreadPerTaskExecutor())
+                        .expireAfterWrite(roomStatusMinutes, TimeUnit.MINUTES)
+                        .build()
+                : new NoOpCache<>();
     }
 
     public List<NamedResult<RoomView>> getRoomStatuses() {
