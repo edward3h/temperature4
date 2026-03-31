@@ -13,7 +13,7 @@ dependencies {
     compileOnly("io.soabase.record-builder:record-builder-core:44")
     implementation("io.avaje:avaje-jsonb:3.5")
     implementation("org.jspecify:jspecify:1.0.0")
-    testImplementation("com.google.truth:truth:1.4.4")
+    testImplementation("com.google.truth:truth:1.4.5")
 }
 
 testing {

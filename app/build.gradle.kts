@@ -32,7 +32,7 @@ dependencies {
     implementation(project(":kumo"))
     jteGenerate("gg.jte:jte-models:3.2.3")
     runtimeOnly("org.logevents:logevents:0.5.9")
-    testImplementation("com.google.truth:truth:1.4.4")
+    testImplementation("com.google.truth:truth:1.4.5")
 }
 
 testing {
