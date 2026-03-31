@@ -7,8 +7,7 @@ import io.avaje.jsonb.Jsonb;
 import org.junit.jupiter.api.Test;
 
 class KumoRoomStatusSerializerTest {
-    String sample =
-            """
+    String sample = """
                 {
                   "r": {
                     "indoorUnit": {

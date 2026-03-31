@@ -1,4 +1,4 @@
-FROM eclipse-temurin:23-jre-alpine
+FROM eclipse-temurin:25.0.2_10-jre-alpine
 LABEL authors="edward3h"
 
 RUN mkdir "/config" && mkdir "/data"

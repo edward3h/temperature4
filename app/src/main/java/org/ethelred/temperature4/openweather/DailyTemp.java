@@ -9,7 +9,6 @@ public record DailyTemp(Temperature min, Temperature max) {
     public String display() {
         return """
     <span class="low">%s</span>/<span class="high">%s</span>
-    """
-                .formatted(min.display(), max.display());
+    """.formatted(min.display(), max.display());
     }
 }
