@@ -9,7 +9,8 @@ import io.avaje.inject.Bean;
 import io.avaje.inject.Factory;
 import java.util.List;
 import java.util.concurrent.Executors;
-import org.ethelred.temperature4.kumojs.KumoJsClient;
+import org.ethelred.kumo.KumoService;
+import org.ethelred.kumo.KumoServiceImpl;
 import org.ethelred.temperature4.openweather.OpenWeatherClient;
 import org.ethelred.temperature4.sensors.SensorsClient;
 import org.ethelred.temperature4.template.StaticTemplates;
@@ -45,8 +46,8 @@ public class FactoryForAllTheThings {
     }
 
     @Bean
-    public KumoJsClient kumoJsClient(Configuration configuration) {
-        return client(KumoJsClient.class, configuration, "kumojs");
+    public KumoService kumoService(Configuration configuration) {
+        return new KumoServiceImpl(configuration.get("kumo.configFile"));
     }
 
     @Bean

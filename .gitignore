@@ -6,3 +6,6 @@ build
 
 app/storage
 .idea
+**/bin
+/storage
+*.log

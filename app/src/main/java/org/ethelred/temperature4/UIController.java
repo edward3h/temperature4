@@ -14,7 +14,7 @@ import io.avaje.http.api.Produces;
 import io.javalin.http.ContentType;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
-import org.ethelred.temperature4.kumojs.KumoJsClient;
+import java.util.List;
 import org.ethelred.temperature4.openweather.OpenWeatherRepository;
 import org.ethelred.temperature4.template.Templates;
 import org.jspecify.annotations.Nullable;
@@ -59,7 +59,8 @@ public class UIController {
         var status = roomService.getRoom(room);
         if (status.isPresent()) {
             var req = new UIRequestContext(room, "room", contextPath);
-            return withLayout(htmx, req, templates.room(req, KumoJsClient.MODES, status.get()), javalinContext);
+            return withLayout(
+                    htmx, req, templates.room(req, List.of("off", "heat", "cool"), status.get()), javalinContext);
         }
         javalinContext.status(HttpStatus.NOT_FOUND);
         return "";

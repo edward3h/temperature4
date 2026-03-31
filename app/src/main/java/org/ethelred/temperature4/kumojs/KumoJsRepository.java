@@ -12,10 +12,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import org.ethelred.kumo.KumoService;
 import org.ethelred.temperature4.ErrorNamedResult;
 import org.ethelred.temperature4.NamedResult;
 import org.ethelred.temperature4.NoOpCache;
 import org.ethelred.temperature4.RoomView;
+import org.ethelred.temperature4.Temperature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,11 +27,11 @@ public class KumoJsRepository {
     private final Object ROOM_LIST_KEY = new Object();
     private final Cache<Object, List<String>> roomListCache;
     private final Cache<String, RoomStatus> roomStatusCache;
-    private final KumoJsClient client;
+    private final KumoService kumoService;
     private final Set<String> excludeRooms;
 
-    public KumoJsRepository(Configuration configuration, KumoJsClient client) {
-        this.client = client;
+    public KumoJsRepository(Configuration configuration, KumoService kumoService) {
+        this.kumoService = kumoService;
         this.excludeRooms = configuration.set().of("rooms.exclude").stream()
                 .map(String::strip)
                 .collect(Collectors.toSet());
@@ -57,23 +59,34 @@ public class KumoJsRepository {
     }
 
     private List<String> _filteredRoomList() {
-        return client.getRoomList().stream()
+        return kumoService.getRoomList().stream()
                 .filter(Predicate.not(excludeRooms::contains))
                 .toList();
     }
 
     public RoomStatus getRoomStatus(String name) {
         LOGGER.debug("getRoomStatus {}", name);
-        return Objects.requireNonNull(roomStatusCache.get(name, client::getRoomStatus));
+        return Objects.requireNonNull(roomStatusCache.get(name, n -> {
+            var s = kumoService.getRoomStatus(n);
+            return new RoomStatus(
+                    new Temperature(s.roomTempCelsius()),
+                    s.mode(),
+                    s.spCoolCelsius() != null ? new Temperature(s.spCoolCelsius()) : null,
+                    s.spHeatCelsius() != null ? new Temperature(s.spHeatCelsius()) : null);
+        }));
     }
 
     public void setMode(String name, String mode) {
-        client.setMode(name, mode);
+        kumoService.setMode(name, mode);
         roomStatusCache.invalidate(name);
     }
 
     public void setTemperature(String name, String mode, int newTemp) {
-        client.setTemperature(name, mode, newTemp);
+        if ("cool".equalsIgnoreCase(mode)) {
+            kumoService.setCoolTemperature(name, newTemp);
+        } else {
+            kumoService.setHeatTemperature(name, newTemp);
+        }
         roomStatusCache.invalidate(name);
     }
 

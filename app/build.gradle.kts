@@ -29,6 +29,7 @@ dependencies {
     implementation("io.avaje:avaje-config:4.0")
     implementation("org.eclipse.store:storage-embedded:2.1.3")
     implementation("com.github.ben-manes.caffeine:caffeine:3.2.0")
+    implementation(project(":kumo"))
     jteGenerate("gg.jte:jte-models:3.1.16")
     runtimeOnly("org.logevents:logevents:0.5.7")
     testImplementation("com.google.truth:truth:1.4.4")
