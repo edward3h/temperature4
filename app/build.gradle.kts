@@ -21,7 +21,7 @@ dependencies {
     implementation("io.avaje:avaje-http-api:3.7")
     implementation("io.avaje:avaje-http-client:3.7")
 //    implementation("io.avaje:avaje-jex:3.0-RC20")
-    implementation("io.javalin:javalin:6.6.0")
+    implementation("io.javalin:javalin:6.7.0")
     implementation("io.avaje:avaje-jsonb:3.5")
     implementation("gg.jte:jte:3.2.1")
     implementation("gg.jte:jte-models:3.2.3")
