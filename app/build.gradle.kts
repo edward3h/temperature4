@@ -15,7 +15,7 @@ dependencies {
     annotationProcessor("io.avaje:avaje-http-javalin-generator:3.7")
     annotationProcessor("io.avaje:avaje-http-client-generator:3.7")
     annotationProcessor("io.avaje:avaje-jsonb-generator:3.5")
-    annotationProcessor("io.soabase.record-builder:record-builder-processor:44")
+    annotationProcessor("io.soabase.record-builder:record-builder-processor:52")
     compileOnly("io.soabase.record-builder:record-builder-core:44")
     implementation("io.avaje:avaje-inject:11.5")
     implementation("io.avaje:avaje-http-api:3.7")
