@@ -8,7 +8,10 @@ import org.jspecify.annotations.Nullable;
 // @Json
 @RecordBuilderFull
 public record RoomStatus(
-        Temperature roomTemp, String mode, @Nullable Temperature spCool, @Nullable Temperature spHeat) {
+        Temperature roomTemp,
+        String mode,
+        @Nullable Temperature spCool,
+        @Nullable Temperature spHeat) {
     public String setting() {
         if ("heat".equalsIgnoreCase(mode()) && spHeat != null) {
             return spHeat.display();

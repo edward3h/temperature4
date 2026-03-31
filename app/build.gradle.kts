@@ -2,7 +2,7 @@ plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     application
     id("gg.jte.gradle") version "3.2.3"
-    id("com.diffplug.spotless") version "7.2.1"
+    id("com.diffplug.spotless") version "8.4.0"
 }
 
 repositories {
@@ -11,28 +11,28 @@ repositories {
 }
 
 dependencies {
-    annotationProcessor("io.avaje:avaje-inject-generator:11.5")
+    annotationProcessor("io.avaje:avaje-inject-generator:12.4")
     annotationProcessor("io.avaje:avaje-http-javalin-generator:3.7")
     annotationProcessor("io.avaje:avaje-http-client-generator:3.7")
-    annotationProcessor("io.avaje:avaje-jsonb-generator:3.5")
-    annotationProcessor("io.soabase.record-builder:record-builder-processor:44")
-    compileOnly("io.soabase.record-builder:record-builder-core:44")
-    implementation("io.avaje:avaje-inject:11.5")
+    annotationProcessor("io.avaje:avaje-jsonb-generator:3.11")
+    annotationProcessor("io.soabase.record-builder:record-builder-processor:52")
+    compileOnly("io.soabase.record-builder:record-builder-core:52")
+    implementation("io.avaje:avaje-inject:12.4")
     implementation("io.avaje:avaje-http-api:3.7")
     implementation("io.avaje:avaje-http-client:3.7")
 //    implementation("io.avaje:avaje-jex:3.0-RC20")
-    implementation("io.javalin:javalin:6.6.0")
-    implementation("io.avaje:avaje-jsonb:3.5")
-    implementation("gg.jte:jte:3.2.1")
+    implementation("io.javalin:javalin:7.1.0")
+    implementation("io.avaje:avaje-jsonb:3.11")
+    implementation("gg.jte:jte:3.2.3")
     implementation("gg.jte:jte-models:3.2.3")
     implementation("org.jspecify:jspecify:1.0.0")
-    implementation("io.avaje:avaje-config:4.4")
-    implementation("org.eclipse.store:storage-embedded:2.1.3")
+    implementation("io.avaje:avaje-config:5.1")
+    implementation("org.eclipse.store:storage-embedded:4.0.1")
     implementation("com.github.ben-manes.caffeine:caffeine:3.2.3")
     implementation(project(":kumo"))
     jteGenerate("gg.jte:jte-models:3.2.3")
     runtimeOnly("org.logevents:logevents:0.5.9")
-    testImplementation("com.google.truth:truth:1.4.4")
+    testImplementation("com.google.truth:truth:1.4.5")
 }
 
 testing {

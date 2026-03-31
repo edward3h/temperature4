@@ -25,9 +25,9 @@ public class Main {
                     cfg.router.contextPath = configuration.get("server.contextPath", "/");
                     services.forEach(cfg::registerPlugin);
                     cfg.staticFiles.add("/static", Location.CLASSPATH);
+                    cfg.routes.beforeMatched(Main::beforeRequest);
+                    cfg.routes.afterMatched(Main::afterRequest);
                 })
-                .beforeMatched(Main::beforeRequest)
-                .afterMatched(Main::afterRequest)
                 .start(configuration.getInt("server.port", 8080));
     }
 

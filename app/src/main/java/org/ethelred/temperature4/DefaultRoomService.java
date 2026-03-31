@@ -102,8 +102,10 @@ public class DefaultRoomService implements RoomService {
         return room;
     }
 
-    private record CombinedRoom(RoomView room, @Nullable SensorView sensorView, @Nullable Setting setting)
-            implements RoomView {
+    private record CombinedRoom(
+            RoomView room,
+            @Nullable SensorView sensorView,
+            @Nullable Setting setting) implements RoomView {
         @Override
         public String name() {
             return room.name();
@@ -116,8 +118,7 @@ public class DefaultRoomService implements RoomService {
             }
             return """
                     %s <span class="ago">(%s)</span>
-                    """
-                    .formatted(sensorView.temperature().display(), room.roomTemp());
+                    """.formatted(sensorView.temperature().display(), room.roomTemp());
         }
 
         @Override
@@ -132,8 +133,7 @@ public class DefaultRoomService implements RoomService {
             }
             return """
                     %s <span class="ago">(%s)</span>
-                    """
-                    .formatted(setting.settingFahrenheit(), room.displaySetting());
+                    """.formatted(setting.settingFahrenheit(), room.displaySetting());
         }
     }
 }
