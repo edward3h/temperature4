@@ -10,7 +10,7 @@ repositories {
 dependencies {
     annotationProcessor("io.avaje:avaje-jsonb-generator:3.5")
     annotationProcessor("io.soabase.record-builder:record-builder-processor:44")
-    compileOnly("io.soabase.record-builder:record-builder-core:44")
+    compileOnly("io.soabase.record-builder:record-builder-core:52")
     implementation("io.avaje:avaje-jsonb:3.5")
     implementation("org.jspecify:jspecify:1.0.0")
     testImplementation("com.google.truth:truth:1.4.4")
