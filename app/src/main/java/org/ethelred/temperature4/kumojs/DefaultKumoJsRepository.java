@@ -1,4 +1,4 @@
-// (C) Edward Harman 2025
+// (C) Edward Harman 2026
 package org.ethelred.temperature4.kumojs;
 
 import com.github.benmanes.caffeine.cache.Cache;
