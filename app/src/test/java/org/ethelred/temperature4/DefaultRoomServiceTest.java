@@ -69,10 +69,10 @@ class DefaultRoomServiceTest {
 
     @Test
     void updateRoom_savesSetting_whenSensorPresent() {
-        fakeKumo.addRoom("TestRoom", kumoAt(70, "heat"));
+        fakeKumo.addRoom("TestRoom", kumoAt(70, "cool")); // start in cool mode
         sensorMapping.addSensorRoom("TestRoom");
 
-        service.updateRoom("TestRoom", Mode.heat, TemperatureSettingAction.NONE);
+        service.updateRoom("TestRoom", Mode.heat, TemperatureSettingAction.NONE); // change to heat
 
         var saved = settingRepo.findByRoom("TestRoom");
         assertThat(saved).isNotNull();
