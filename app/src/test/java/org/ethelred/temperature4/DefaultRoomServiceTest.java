@@ -29,8 +29,8 @@ class DefaultRoomServiceTest {
     }
 
     private RoomStatus kumoAt(int fahrenheit, String mode) {
-        return new RoomStatus(Temperature.fromFahrenheit(fahrenheit), mode,
-                null, Temperature.fromFahrenheit(fahrenheit));
+        return new RoomStatus(
+                Temperature.fromFahrenheit(fahrenheit), mode, null, Temperature.fromFahrenheit(fahrenheit));
     }
 
     @Test

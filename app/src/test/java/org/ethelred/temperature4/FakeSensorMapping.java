@@ -18,8 +18,7 @@ class FakeSensorMapping implements SensorMapping {
     /** Register room with a sensor reading at the given Fahrenheit temperature. */
     void addSensorRoom(String name, double fahrenheit) {
         rooms.add(name);
-        var result = new SensorResult(OffsetDateTime.now(), "1",
-                Temperature.fromFahrenheit(fahrenheit), true);
+        var result = new SensorResult(OffsetDateTime.now(), "1", Temperature.fromFahrenheit(fahrenheit), true);
         channelMap.put(name, new DefaultSensorMapping.MappedSensorView(name, result));
     }
 

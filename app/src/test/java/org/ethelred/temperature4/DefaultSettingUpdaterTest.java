@@ -4,7 +4,6 @@ package org.ethelred.temperature4;
 import static com.google.common.truth.Truth.assertThat;
 
 import io.avaje.config.Config;
-import java.util.List;
 import org.ethelred.temperature4.kumojs.FakeKumoJsRepository;
 import org.ethelred.temperature4.kumojs.RoomStatus;
 import org.ethelred.temperature4.sensors.FakeSensorsRepository;
@@ -25,13 +24,13 @@ class DefaultSettingUpdaterTest {
         fakeSensors = new FakeSensorsRepository();
         settingRepo = new InMemorySettingRepository();
         sensorMapping = new FakeSensorMapping();
-        updater = new DefaultSettingUpdater(
-                Config.asConfiguration(), settingRepo, fakeKumo, fakeSensors, sensorMapping);
+        updater =
+                new DefaultSettingUpdater(Config.asConfiguration(), settingRepo, fakeKumo, fakeSensors, sensorMapping);
     }
 
     private RoomStatus kumoAt(int fahrenheit, String mode) {
-        return new RoomStatus(Temperature.fromFahrenheit(fahrenheit), mode,
-                null, Temperature.fromFahrenheit(fahrenheit));
+        return new RoomStatus(
+                Temperature.fromFahrenheit(fahrenheit), mode, null, Temperature.fromFahrenheit(fahrenheit));
     }
 
     @Test
@@ -92,8 +91,7 @@ class DefaultSettingUpdaterTest {
     @Test
     void skipsTemperature_whenModeIsOff() {
         settingRepo.update(new Setting("TestRoom", 70, Mode.off));
-        fakeKumo.addRoom("TestRoom", new RoomStatus(
-                Temperature.fromFahrenheit(70), "off", null, null));
+        fakeKumo.addRoom("TestRoom", new RoomStatus(Temperature.fromFahrenheit(70), "off", null, null));
         sensorMapping.addSensorRoom("TestRoom", 65.0);
 
         updater.checkForUpdates(true);

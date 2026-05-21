@@ -20,13 +20,11 @@ class DefaultSensorMappingTest {
     }
 
     private SensorResult freshResult(String channel) {
-        return new SensorResult(OffsetDateTime.now().minusMinutes(5), channel,
-                Temperature.fromFahrenheit(68.0), true);
+        return new SensorResult(OffsetDateTime.now().minusMinutes(5), channel, Temperature.fromFahrenheit(68.0), true);
     }
 
     private SensorResult staleResult(String channel) {
-        return new SensorResult(OffsetDateTime.now().minusHours(7), channel,
-                Temperature.fromFahrenheit(65.0), true);
+        return new SensorResult(OffsetDateTime.now().minusHours(7), channel, Temperature.fromFahrenheit(65.0), true);
     }
 
     @Test
@@ -57,10 +55,8 @@ class DefaultSensorMappingTest {
 
     @Test
     void allChannels_deduplicatesByChannel_returnsNewest() {
-        var older = new SensorResult(OffsetDateTime.now().minusHours(2), "1",
-                Temperature.fromFahrenheit(65.0), true);
-        var newer = new SensorResult(OffsetDateTime.now().minusMinutes(5), "1",
-                Temperature.fromFahrenheit(70.0), true);
+        var older = new SensorResult(OffsetDateTime.now().minusHours(2), "1", Temperature.fromFahrenheit(65.0), true);
+        var newer = new SensorResult(OffsetDateTime.now().minusMinutes(5), "1", Temperature.fromFahrenheit(70.0), true);
         var views = mapping.allChannels(List.of(older, newer));
         assertThat(views).hasSize(1);
         assertThat(views.get(0).temperature().fahrenheit()).isWithin(0.1).of(70.0);

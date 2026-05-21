@@ -2,7 +2,7 @@ app:
   name: temperature4
 
 kumo:
-  configFile: /etc/kumo/kumo.cfg
+  configFile: src/main/resources/kumo.cfg
 
 cache:
   roomlist:

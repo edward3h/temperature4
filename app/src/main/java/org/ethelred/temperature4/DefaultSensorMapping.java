@@ -62,7 +62,8 @@ public class DefaultSensorMapping implements SensorMapping {
     public List<SensorView> allChannels(Collection<SensorResult> sensorResults) {
         var distinct = sensorResults.stream()
                 .filter(Predicate.not(tooOld()))
-                .collect(Collectors.groupingBy(SensorResult::channel, Collectors.maxBy(Comparator.comparing(SensorResult::time))))
+                .collect(Collectors.groupingBy(
+                        SensorResult::channel, Collectors.maxBy(Comparator.comparing(SensorResult::time))))
                 .values();
         return distinct.stream()
                 .flatMap(Optional::stream)
