@@ -43,7 +43,9 @@ class SettingControllerTest {
     @Test
     void getAll_returnsEmptyList_initially() throws Exception {
         var response = http.send(
-                HttpRequest.newBuilder(URI.create(baseUrl() + "/api/settings")).GET().build(),
+                HttpRequest.newBuilder(URI.create(baseUrl() + "/api/settings"))
+                        .GET()
+                        .build(),
                 HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode()).isEqualTo(200);
         assertThat(response.body()).isEqualTo("[]");
@@ -51,16 +53,19 @@ class SettingControllerTest {
 
     @Test
     void update_thenGetAll_returnsSetting() throws Exception {
-        http.send(
+        var postResponse = http.send(
                 HttpRequest.newBuilder(URI.create(baseUrl() + "/api/settings"))
                         .header("Content-Type", "application/json")
                         .POST(HttpRequest.BodyPublishers.ofString(
                                 "{\"room\":\"TestRoom\",\"settingFahrenheit\":70,\"mode\":\"heat\"}"))
                         .build(),
                 HttpResponse.BodyHandlers.ofString());
+        assertThat(postResponse.statusCode()).isEqualTo(201);
 
         var response = http.send(
-                HttpRequest.newBuilder(URI.create(baseUrl() + "/api/settings")).GET().build(),
+                HttpRequest.newBuilder(URI.create(baseUrl() + "/api/settings"))
+                        .GET()
+                        .build(),
                 HttpResponse.BodyHandlers.ofString());
         assertThat(response.body()).contains("TestRoom");
         assertThat(response.body()).contains("heat");

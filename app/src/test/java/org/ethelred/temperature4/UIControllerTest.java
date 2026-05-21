@@ -27,11 +27,8 @@ class UIControllerTest {
     void setUp() {
         fakeRoomService = new FakeRoomService();
         var weatherRepo = new OpenWeatherRepository(new FakeOpenWeatherClient());
-        var controller = new UIController(
-                Config.asConfiguration(),
-                new StaticTemplates(),
-                weatherRepo,
-                fakeRoomService);
+        var controller =
+                new UIController(Config.asConfiguration(), new StaticTemplates(), weatherRepo, fakeRoomService);
         app = Javalin.create(cfg -> cfg.registerPlugin(new UIController$Route(controller)));
         app.start(0);
         port = app.port();
@@ -55,15 +52,16 @@ class UIControllerTest {
                 HttpRequest.newBuilder(URI.create(baseUrl() + "/")).GET().build(),
                 HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode()).isEqualTo(200);
-        assertThat(response.headers().firstValue("content-type").orElse(""))
-                .contains("text/html");
+        assertThat(response.headers().firstValue("content-type").orElse("")).contains("text/html");
     }
 
     @Test
     void getRoom_returns200_forKnownRoom() throws Exception {
         fakeRoomService.addRoom(new SimpleRoomView("TestRoom"));
         var response = http.send(
-                HttpRequest.newBuilder(URI.create(baseUrl() + "/room/TestRoom")).GET().build(),
+                HttpRequest.newBuilder(URI.create(baseUrl() + "/room/TestRoom"))
+                        .GET()
+                        .build(),
                 HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode()).isEqualTo(200);
     }
@@ -71,7 +69,9 @@ class UIControllerTest {
     @Test
     void getRoom_returns404_forUnknownRoom() throws Exception {
         var response = http.send(
-                HttpRequest.newBuilder(URI.create(baseUrl() + "/room/NoSuchRoom")).GET().build(),
+                HttpRequest.newBuilder(URI.create(baseUrl() + "/room/NoSuchRoom"))
+                        .GET()
+                        .build(),
                 HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode()).isEqualTo(404);
     }
@@ -86,8 +86,7 @@ class UIControllerTest {
                         .build(),
                 HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode()).isEqualTo(303);
-        assertThat(response.headers().firstValue("location").orElse(""))
-                .contains("/room/TestRoom");
+        assertThat(response.headers().firstValue("location").orElse("")).contains("/room/TestRoom");
     }
 
     private record SimpleRoomView(String name) implements RoomView {
