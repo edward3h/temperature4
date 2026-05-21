@@ -11,7 +11,7 @@ dependencies {
     annotationProcessor("io.avaje:avaje-jsonb-generator:3.11")
     annotationProcessor("io.soabase.record-builder:record-builder-processor:52")
     compileOnly("io.soabase.record-builder:record-builder-core:52")
-    implementation("io.avaje:avaje-jsonb:3.11")
+    implementation("io.avaje:avaje-jsonb:3.13")
     implementation("org.jspecify:jspecify:1.0.0")
     testImplementation("com.google.truth:truth:1.4.5")
 }
