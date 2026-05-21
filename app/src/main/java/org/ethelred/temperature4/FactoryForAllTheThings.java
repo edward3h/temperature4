@@ -7,11 +7,15 @@ import io.avaje.http.client.HttpClient;
 import io.avaje.http.client.RequestListener;
 import io.avaje.inject.Bean;
 import io.avaje.inject.Factory;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.Executors;
+import org.ethelred.kumo.KumoRoomStatus;
 import org.ethelred.kumo.KumoService;
 import org.ethelred.kumo.KumoServiceImpl;
+import org.ethelred.temperature4.openweather.Current;
 import org.ethelred.temperature4.openweather.OpenWeatherClient;
+import org.ethelred.temperature4.openweather.OpenWeatherResult;
 import org.ethelred.temperature4.sensors.SensorsClient;
 import org.ethelred.temperature4.template.StaticTemplates;
 import org.ethelred.temperature4.template.Templates;
@@ -20,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 @Factory
 public class FactoryForAllTheThings {
+    private static final Logger log = LoggerFactory.getLogger(FactoryForAllTheThings.class);
     private final Logger requestTimingLogger = LoggerFactory.getLogger("REQUEST_TIMING");
 
     @Bean
@@ -47,12 +52,41 @@ public class FactoryForAllTheThings {
 
     @Bean
     public KumoService kumoService(Configuration configuration) {
-        return new KumoServiceImpl(configuration.get("kumo.configFile"));
+        try {
+            return new KumoServiceImpl(configuration.get("kumo.configFile"));
+        } catch (Exception e) {
+            log.warn("Kumo service unavailable: {}", e.getMessage());
+            return new KumoService() {
+                public List<String> getRoomList() {
+                    return List.of();
+                }
+
+                public KumoRoomStatus getRoomStatus(String r) {
+                    throw new UnsupportedOperationException();
+                }
+
+                public void setMode(String r, String m) {}
+
+                public void setFanSpeed(String r, String s) {}
+
+                public void setVentDirection(String r, String d) {}
+
+                public void setCoolTemperature(String r, int t) {}
+
+                public void setHeatTemperature(String r, int t) {}
+            };
+        }
     }
 
     @Bean
     public OpenWeatherClient openWeatherClient(Configuration configuration) {
-        return client(OpenWeatherClient.class, configuration, "openweather");
+        try {
+            return client(OpenWeatherClient.class, configuration, "openweather");
+        } catch (Exception e) {
+            log.warn("OpenWeather service unavailable: {}", e.getMessage());
+            return () -> new OpenWeatherResult(
+                    new Current(LocalDateTime.now(), Temperature.fromFahrenheit(0.0), List.of()), List.of());
+        }
     }
 
     @Bean
