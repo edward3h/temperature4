@@ -21,7 +21,7 @@ class DefaultRoomServiceTest {
     @BeforeEach
     void setUp() {
         fakeKumo = new FakeKumoJsRepository();
-        fakeSensors = new FakeSensorsRepository();
+        fakeSensors = new FakeSensorsRepository(); // wired but unused: FakeSensorMapping.allChannels bypasses it
         settingRepo = new InMemorySettingRepository();
         sensorMapping = new FakeSensorMapping();
         noOpUpdater = new NoOpSettingUpdater();

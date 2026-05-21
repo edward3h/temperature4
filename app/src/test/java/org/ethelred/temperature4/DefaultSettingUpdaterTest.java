@@ -24,6 +24,7 @@ class DefaultSettingUpdaterTest {
         fakeSensors = new FakeSensorsRepository();
         settingRepo = new InMemorySettingRepository();
         sensorMapping = new FakeSensorMapping();
+        // fakeSensors is wired but never populated: FakeSensorMapping.channelForRoom ignores sensorResults
         updater =
                 new DefaultSettingUpdater(Config.asConfiguration(), settingRepo, fakeKumo, fakeSensors, sensorMapping);
     }
