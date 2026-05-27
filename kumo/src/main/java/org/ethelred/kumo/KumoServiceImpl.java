@@ -40,6 +40,9 @@ public class KumoServiceImpl implements KumoService {
     public KumoRoomStatus getRoomStatus(String roomLabel) {
         var body = "{\"c\":{\"indoorUnit\":{\"status\":{}}}}";
         var response = sendRequest(roomLabel, body);
+        if (response.contains("\"_api_error\"")) {
+            throw new RuntimeException("Device authentication error for " + roomLabel);
+        }
         return jsonb.type(KumoRoomStatus.class).fromJson(response);
     }
 
