@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 /**
  * Integration test against real Kumo devices. Run with:
@@ -129,6 +130,46 @@ class KumoIntegrationTest {
             // ignore
         }
         return null;
+    }
+
+    @Test
+    @Timeout(30)
+    void setModeTiming() throws Exception {
+        var service = new KumoServiceImpl(CONFIG_FILE.toString());
+        Assumptions.assumeTrue(
+                service.getRoomList().contains("Basement"),
+                "Integration test skipped: Basement not found in kumo.cfg");
+
+        var initial = service.getRoomStatus("Basement");
+        var initialMode = initial.mode();
+        var targetMode = "off".equals(initialMode) ? "cool" : "off";
+
+        System.out.printf("Basement initial mode: %s → setting to: %s%n", initialMode, targetMode);
+
+        try {
+            service.setMode("Basement", targetMode);
+            var startNs = System.nanoTime();
+            System.out.printf("setMode sent at t=0%n");
+
+            var changed = false;
+            for (int i = 0; i < 20; i++) {
+                Thread.sleep(500);
+                var elapsed = (System.nanoTime() - startNs) / 1_000_000;
+                var status = service.getRoomStatus("Basement");
+                System.out.printf("  t=%4dms  mode=%s%n", elapsed, status.mode());
+                if (targetMode.equals(status.mode())) {
+                    System.out.printf("  => mode reflected in status after %dms%n", elapsed);
+                    changed = true;
+                    break;
+                }
+            }
+            if (!changed) {
+                System.out.println("  => mode not reflected in status within 10s");
+            }
+        } finally {
+            System.out.printf("Restoring mode to: %s%n", initialMode);
+            service.setMode("Basement", initialMode);
+        }
     }
 
     private static String hex(byte[] bytes) {
