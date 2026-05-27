@@ -89,7 +89,8 @@ public class UIController {
         if (optimistic.isPresent()) {
             javalinContext.status(HttpStatus.OK);
             var req = new UIRequestContext(room, "room", contextPath);
-            return withLayout(htmx, req, templates.room(req, List.of("off", "heat", "cool"), optimistic.get()), javalinContext);
+            return withLayout(
+                    htmx, req, templates.room(req, List.of("off", "heat", "cool"), optimistic.get()), javalinContext);
         }
         javalinContext.redirect(contextPath + "room/" + room, HttpStatus.SEE_OTHER);
         return "";
