@@ -1,5 +1,5 @@
 plugins {
-    id("com.diffplug.spotless") version "8.5.1" apply false
+    id("com.diffplug.spotless") version "8.6.0" apply false
 }
 
 val dockerBuild by tasks.registering(Exec::class) {
