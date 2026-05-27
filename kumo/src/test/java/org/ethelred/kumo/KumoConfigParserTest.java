@@ -10,18 +10,23 @@ import org.junit.jupiter.api.io.TempDir;
 
 class KumoConfigParserTest {
 
+    // base64([1,2,3,4]) = "AQIDBA=="
+    // hex([0,1,2,3,4,5,6,7,8]) = "000102030405060708"
+    // hex(32 zero bytes) = 64 zeros
+
     @Test
     void parse_validConfigWithModuleExports(@TempDir Path tempDir) throws Exception {
         var configFile = tempDir.resolve("kumo.cfg");
         Files.writeString(
                 configFile,
-                "module.exports = {\"account\":{\"hash\":{\"Living Room\":"
-                        + "{\"address\":\"192.168.1.100\","
-                        + "\"password\":[1,2,3,4],"
-                        + "\"cryptoSerial\":[0,1,2,3,4,5,6,7,8],"
-                        + "\"s\":2,"
-                        + "\"w\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]"
-                        + "}}}};");
+                "module.exports = {\"user@example.com\":{\"SERIAL001\":{"
+                        + "\"label\":\"Living Room\","
+                        + "\"address\":\"192.168.1.100\","
+                        + "\"password\":\"AQIDBA==\","
+                        + "\"cryptoSerial\":\"000102030405060708\","
+                        + "\"S\":2,"
+                        + "\"W\":\"0000000000000000000000000000000000000000000000000000000000000000\""
+                        + "}}};");
         var parser = new KumoConfigParser(configFile.toString());
         var devices = parser.parse();
         assertThat(devices).hasSize(1);
@@ -38,13 +43,14 @@ class KumoConfigParserTest {
         var configFile = tempDir.resolve("kumo.cfg");
         Files.writeString(
                 configFile,
-                "{\"account\":{\"hash\":{\"Bedroom\":"
-                        + "{\"address\":\"192.168.1.101\","
-                        + "\"password\":[5,6],"
-                        + "\"cryptoSerial\":[0,1,2,3,4,5,6,7,8],"
-                        + "\"s\":0,"
-                        + "\"w\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]"
-                        + "}}}}");
+                "{\"user@example.com\":{\"SERIAL002\":{"
+                        + "\"label\":\"Bedroom\","
+                        + "\"address\":\"192.168.1.101\","
+                        + "\"password\":\"BQY=\","
+                        + "\"cryptoSerial\":\"000102030405060708\","
+                        + "\"S\":0,"
+                        + "\"W\":\"0000000000000000000000000000000000000000000000000000000000000000\""
+                        + "}}}");
         var parser = new KumoConfigParser(configFile.toString());
         var devices = parser.parse();
         assertThat(devices).hasSize(1);
@@ -57,10 +63,10 @@ class KumoConfigParserTest {
         var configFile = tempDir.resolve("kumo.cfg");
         Files.writeString(
                 configFile,
-                "{\"account\":{\"hash\":{"
-                        + "\"Room A\":{\"address\":\"10.0.0.1\",\"password\":[1],\"cryptoSerial\":[0,1,2,3,4,5,6,7,8],\"s\":0,\"w\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"
-                        + "\"Room B\":{\"address\":\"10.0.0.2\",\"password\":[2],\"cryptoSerial\":[0,1,2,3,4,5,6,7,8],\"s\":0,\"w\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}"
-                        + "}}}");
+                "{\"user@example.com\":{"
+                        + "\"SERIAL_A\":{\"label\":\"Room A\",\"address\":\"10.0.0.1\",\"password\":\"AQ==\",\"cryptoSerial\":\"000102030405060708\",\"S\":0,\"W\":\"0000000000000000000000000000000000000000000000000000000000000000\"},"
+                        + "\"SERIAL_B\":{\"label\":\"Room B\",\"address\":\"10.0.0.2\",\"password\":\"Ag==\",\"cryptoSerial\":\"000102030405060708\",\"S\":0,\"W\":\"0000000000000000000000000000000000000000000000000000000000000000\"}"
+                        + "}}");
         var parser = new KumoConfigParser(configFile.toString());
         var devices = parser.parse();
         assertThat(devices).hasSize(2);

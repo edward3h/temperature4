@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 public class KumoConfigParser {
@@ -34,32 +35,22 @@ public class KumoConfigParser {
         try (var reader = jsonb.reader(json)) {
             reader.beginObject();
             while (reader.hasNextField()) {
-                if ("account".equals(reader.nextField())) {
-                    reader.beginObject();
-                    while (reader.hasNextField()) {
-                        if ("hash".equals(reader.nextField())) {
-                            reader.beginObject();
-                            while (reader.hasNextField()) {
-                                var label = reader.nextField();
-                                result.add(parseDevice(label, reader));
-                            }
-                            reader.endObject();
-                        } else {
-                            reader.skipValue();
-                        }
-                    }
-                    reader.endObject();
-                } else {
-                    reader.skipValue();
+                reader.nextField(); // skip account email key
+                reader.beginObject();
+                while (reader.hasNextField()) {
+                    reader.nextField(); // skip serial number key
+                    result.add(parseDevice(reader));
                 }
+                reader.endObject();
             }
             reader.endObject();
         }
         return result;
     }
 
-    private KumoDeviceConfig parseDevice(String label, JsonReader reader) {
+    private KumoDeviceConfig parseDevice(JsonReader reader) {
         reader.beginObject();
+        String label = null;
         String address = null;
         byte[] password = null;
         byte[] cryptoSerial = null;
@@ -67,11 +58,12 @@ public class KumoConfigParser {
         byte[] w = null;
         while (reader.hasNextField()) {
             switch (reader.nextField()) {
+                case "label" -> label = reader.readString();
                 case "address" -> address = reader.readString();
-                case "password" -> password = readByteArray(reader);
-                case "cryptoSerial" -> cryptoSerial = readByteArray(reader);
-                case "s" -> s = reader.readInt();
-                case "w" -> w = readByteArray(reader);
+                case "password" -> password = Base64.getDecoder().decode(reader.readString());
+                case "cryptoSerial" -> cryptoSerial = hexToBytes(reader.readString());
+                case "S" -> s = reader.readInt();
+                case "W" -> w = hexToBytes(reader.readString());
                 default -> reader.skipValue();
             }
         }
@@ -79,16 +71,10 @@ public class KumoConfigParser {
         return new KumoDeviceConfig(label, address, password, cryptoSerial, s, w);
     }
 
-    private byte[] readByteArray(JsonReader reader) {
-        var list = new ArrayList<Integer>();
-        reader.beginArray();
-        while (reader.hasNextElement()) {
-            list.add(reader.readInt());
-        }
-        reader.endArray();
-        var bytes = new byte[list.size()];
-        for (int i = 0; i < list.size(); i++) {
-            bytes[i] = (byte) (int) list.get(i);
+    private static byte[] hexToBytes(String hex) {
+        var bytes = new byte[hex.length() / 2];
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = (byte) Integer.parseInt(hex, i * 2, i * 2 + 2, 16);
         }
         return bytes;
     }
