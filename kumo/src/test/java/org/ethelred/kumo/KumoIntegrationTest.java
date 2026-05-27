@@ -137,8 +137,7 @@ class KumoIntegrationTest {
     void setModeTiming() throws Exception {
         var service = new KumoServiceImpl(CONFIG_FILE.toString());
         Assumptions.assumeTrue(
-                service.getRoomList().contains("Basement"),
-                "Integration test skipped: Basement not found in kumo.cfg");
+                service.getRoomList().contains("Basement"), "Integration test skipped: Basement not found in kumo.cfg");
 
         var initial = service.getRoomStatus("Basement");
         var initialMode = initial.mode();
