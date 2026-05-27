@@ -20,8 +20,8 @@ public class KumoConfigParser {
     public List<KumoDeviceConfig> parse() throws IOException {
         var content = Files.readString(Path.of(configFilePath));
         var json = content.strip();
-        if (json.startsWith("module.exports = ")) {
-            json = json.substring("module.exports = ".length()).strip();
+        if (json.startsWith("module.exports =")) {
+            json = json.substring("module.exports =".length()).strip();
         }
         if (json.endsWith(";")) {
             json = json.substring(0, json.length() - 1).strip();

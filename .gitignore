@@ -9,3 +9,4 @@ app/storage
 **/bin
 /storage
 *.log
+app/src/main/resources/kumo.cfg
