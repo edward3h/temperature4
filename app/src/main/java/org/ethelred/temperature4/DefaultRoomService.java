@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.ethelred.temperature4.kumojs.KumoJsRepository;
 import org.ethelred.temperature4.kumojs.NamedRoomStatus;
 import org.ethelred.temperature4.kumojs.RoomStatus;
+import org.ethelred.temperature4.kumojs.RoomStatusBuilder;
 import org.ethelred.temperature4.sensors.SensorsRepository;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -56,16 +57,18 @@ public class DefaultRoomService implements RoomService {
     }
 
     @Override
-    public void updateRoom(String name, Mode mode, TemperatureSettingAction action) {
+    public Optional<RoomView> updateRoom(String name, Mode mode, TemperatureSettingAction action) {
         var roomStatus = kumoJsRepository.getRoomStatus(name);
         var setting = sensorMapping.hasSensor(name) ? settingRepository.findByRoom(name) : null;
         var currentMode = setting == null ? Mode.valueOf(roomStatus.mode()) : setting.mode();
         var currentTemp = setting == null ? roomStatus.sp() : setting.settingFahrenheit();
+        var updatedSetting = setting;
         if (mode != currentMode || action != TemperatureSettingAction.NONE) {
             var newTemp = action.apply(currentTemp);
             if (sensorMapping.hasSensor(name)) {
                 LOGGER.info("Setting update: {} {} {}", name, mode, newTemp);
-                settingRepository.update(new Setting(name, newTemp, mode));
+                updatedSetting = new Setting(name, newTemp, mode);
+                settingRepository.update(updatedSetting);
                 Thread.ofVirtual().start(() -> settingUpdater.checkForUpdates(true));
             } else {
                 LOGGER.info("Direct update: {} {} {}", name, mode, newTemp);
@@ -73,6 +76,9 @@ public class DefaultRoomService implements RoomService {
                 kumoJsRepository.setTemperature(name, mode.toString(), newTemp);
             }
         }
+        var optimisticStatus = RoomStatusBuilder.from(roomStatus).withMode(mode.toString());
+        var sensorResult = sensorMapping.channelForRoom(name, sensorsClient.getSensorResults());
+        return Optional.of(combine(name, optimisticStatus, sensorResult, updatedSetting));
     }
 
     public RoomsAndSensors combine(RoomsAndSensors roomsAndSensors, Iterable<Setting> settings) {

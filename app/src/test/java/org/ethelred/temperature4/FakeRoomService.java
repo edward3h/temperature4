@@ -30,7 +30,8 @@ class FakeRoomService implements RoomService {
     }
 
     @Override
-    public void updateRoom(String name, Mode mode, TemperatureSettingAction action) {
+    public Optional<RoomView> updateRoom(String name, Mode mode, TemperatureSettingAction action) {
         updateRoomCalls.add(name + ":" + mode + ":" + action);
+        return Optional.ofNullable(rooms.get(name));
     }
 }

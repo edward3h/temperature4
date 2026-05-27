@@ -77,7 +77,7 @@ class UIControllerTest {
     }
 
     @Test
-    void postRoom_redirects_afterUpdate() throws Exception {
+    void postRoom_rendersPage_afterUpdate() throws Exception {
         fakeRoomService.addRoom(new SimpleRoomView("TestRoom"));
         var response = http.send(
                 HttpRequest.newBuilder(URI.create(baseUrl() + "/room/TestRoom"))
@@ -85,8 +85,8 @@ class UIControllerTest {
                         .POST(HttpRequest.BodyPublishers.ofString("mode=heat"))
                         .build(),
                 HttpResponse.BodyHandlers.ofString());
-        assertThat(response.statusCode()).isEqualTo(303);
-        assertThat(response.headers().firstValue("location").orElse("")).contains("/room/TestRoom");
+        assertThat(response.statusCode()).isEqualTo(200);
+        assertThat(response.headers().firstValue("content-type").orElse("")).contains("text/html");
     }
 
     private record SimpleRoomView(String name) implements RoomView {

@@ -69,7 +69,13 @@ public class UIController {
     @Post("/room/{room}")
     @Form
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public void updateRoom(String room, String mode, @Nullable String setting, Context javalinContext) {
+    @Produces(MediaType.TEXT_HTML)
+    public String updateRoom(
+            String room,
+            String mode,
+            @Nullable String setting,
+            @Header("hx-request") Boolean htmx,
+            Context javalinContext) {
 
         var modeE = Mode.valueOf(mode);
         var action = TemperatureSettingAction.NONE;
@@ -79,8 +85,14 @@ public class UIController {
         if ("minus".equalsIgnoreCase(setting)) {
             action = TemperatureSettingAction.DECREMENT;
         }
-        roomService.updateRoom(room, modeE, action);
+        var optimistic = roomService.updateRoom(room, modeE, action);
+        if (optimistic.isPresent()) {
+            javalinContext.status(HttpStatus.OK);
+            var req = new UIRequestContext(room, "room", contextPath);
+            return withLayout(htmx, req, templates.room(req, List.of("off", "heat", "cool"), optimistic.get()), javalinContext);
+        }
         javalinContext.redirect(contextPath + "room/" + room, HttpStatus.SEE_OTHER);
+        return "";
     }
 
     String withLayout(@Nullable Boolean htmx, UIRequestContext req, JteModel content, Context javalinContext) {

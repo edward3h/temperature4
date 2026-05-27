@@ -9,5 +9,5 @@ public interface RoomService {
 
     Optional<RoomView> getRoom(String name);
 
-    void updateRoom(String name, Mode mode, TemperatureSettingAction action);
+    Optional<RoomView> updateRoom(String name, Mode mode, TemperatureSettingAction action);
 }
