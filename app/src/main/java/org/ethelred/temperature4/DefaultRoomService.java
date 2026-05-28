@@ -62,9 +62,9 @@ public class DefaultRoomService implements RoomService {
         var setting = sensorMapping.hasSensor(name) ? settingRepository.findByRoom(name) : null;
         var currentMode = setting == null ? Mode.valueOf(roomStatus.mode()) : setting.mode();
         var currentTemp = setting == null ? roomStatus.sp() : setting.settingFahrenheit();
+        var newTemp = action.apply(currentTemp);
         var updatedSetting = setting;
         if (mode != currentMode || action != TemperatureSettingAction.NONE) {
-            var newTemp = action.apply(currentTemp);
             if (sensorMapping.hasSensor(name)) {
                 LOGGER.info("Setting update: {} {} {}", name, mode, newTemp);
                 updatedSetting = new Setting(name, newTemp, mode);
@@ -76,7 +76,15 @@ public class DefaultRoomService implements RoomService {
                 kumoJsRepository.setTemperature(name, mode.toString(), newTemp);
             }
         }
-        var optimisticStatus = RoomStatusBuilder.from(roomStatus).withMode(mode.toString());
+        var newTempObj = Temperature.fromFahrenheit(newTemp);
+        var optimisticStatus = RoomStatusBuilder.from(roomStatus).with(b -> {
+            b.mode(mode.toString());
+            if (mode == Mode.heat) {
+                b.spHeat(newTempObj);
+            } else if (mode == Mode.cool) {
+                b.spCool(newTempObj);
+            }
+        });
         var sensorResult = sensorMapping.channelForRoom(name, sensorsClient.getSensorResults());
         return Optional.of(combine(name, optimisticStatus, sensorResult, updatedSetting));
     }

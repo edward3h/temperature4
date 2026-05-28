@@ -97,4 +97,14 @@ class DefaultRoomServiceTest {
         assertThat(fakeKumo.modeCallArgs).isEmpty();
         assertThat(fakeKumo.tempCallArgs).isEmpty();
     }
+
+    @Test
+    void updateRoom_optimisticResponse_reflectsNewTemp_whenNoSensor() {
+        fakeKumo.addRoom("TestRoom", kumoAt(70, "heat"));
+
+        var result = service.updateRoom("TestRoom", Mode.heat, TemperatureSettingAction.INCREMENT);
+
+        assertThat(result).isPresent();
+        assertThat(result.get().displaySetting()).isEqualTo("72");
+    }
 }

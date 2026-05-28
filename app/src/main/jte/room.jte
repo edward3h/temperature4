@@ -15,9 +15,11 @@
         <label for="${mode}">${mode}</label>
     @endfor
     <div>
-        <button name="setting" value="minus">-</button>
+        <button type="button" name="setting" value="minus"
+                data-hx-post="#" data-hx-target="#content" data-hx-include="closest form">-</button>
         <span>$unsafe{room.displaySetting()}</span>
-        <button name="setting" value="plus">+</button>
+        <button type="button" name="setting" value="plus"
+                data-hx-post="#" data-hx-target="#content" data-hx-include="closest form">+</button>
     </div>
 </form>
 <div><a href="${req.contextPath()}">Back</a></div>
