@@ -136,6 +136,16 @@ public class DefaultRoomService implements RoomService {
         }
 
         @Override
+        public String roomTemp(Temperature.Unit unit) {
+            if (sensorView == null) {
+                return room.roomTemp(unit);
+            }
+            return """
+                    %s <span class="ago">(%s)</span>
+                    """.formatted(sensorView.temperature().display(unit), room.roomTemp(unit));
+        }
+
+        @Override
         public String mode() {
             return room.mode();
         }
@@ -148,6 +158,17 @@ public class DefaultRoomService implements RoomService {
             return """
                     %s <span class="ago">(%s)</span>
                     """.formatted(setting.settingFahrenheit(), room.displaySetting());
+        }
+
+        @Override
+        public String displaySetting(Temperature.Unit unit) {
+            if (setting == null || sensorView == null) {
+                return room.displaySetting(unit);
+            }
+            var settingTemp = Temperature.fromFahrenheit(setting.settingFahrenheit());
+            return """
+                    %s <span class="ago">(%s)</span>
+                    """.formatted(settingTemp.display(unit), room.displaySetting(unit));
         }
     }
 }

@@ -48,7 +48,7 @@ public class UIController {
         var roomsAndSensors = roomService.getRoomsAndSensors();
         var sensors = roomsAndSensors.sensors();
         var roomViews = roomsAndSensors.rooms();
-        var req = new UIRequestContext("", "index", contextPath);
+        var req = new UIRequestContext("", "index", contextPath, readUnitPreference(javalinContext));
         return withLayout(htmx, req, templates.index(req, roomViews, weather, sensors), javalinContext);
     }
 
@@ -58,7 +58,7 @@ public class UIController {
 
         var status = roomService.getRoom(room);
         if (status.isPresent()) {
-            var req = new UIRequestContext(room, "room", contextPath);
+            var req = new UIRequestContext(room, "room", contextPath, readUnitPreference(javalinContext));
             return withLayout(
                     htmx, req, templates.room(req, List.of("off", "heat", "cool"), status.get()), javalinContext);
         }
@@ -88,12 +88,34 @@ public class UIController {
         var optimistic = roomService.updateRoom(room, modeE, action);
         if (optimistic.isPresent()) {
             javalinContext.status(HttpStatus.OK);
-            var req = new UIRequestContext(room, "room", contextPath);
+            var req = new UIRequestContext(room, "room", contextPath, readUnitPreference(javalinContext));
             return withLayout(
                     htmx, req, templates.room(req, List.of("off", "heat", "cool"), optimistic.get()), javalinContext);
         }
         javalinContext.redirect(contextPath + "room/" + room, HttpStatus.SEE_OTHER);
         return "";
+    }
+
+    @Post("/preferences/unit")
+    @Produces(MediaType.TEXT_HTML)
+    public String toggleUnit(Context javalinContext) {
+        var current = readUnitPreference(javalinContext);
+        var next = current == Temperature.Unit.FAHRENHEIT ? Temperature.Unit.CELSIUS : Temperature.Unit.FAHRENHEIT;
+        javalinContext.cookie("temperature_unit", next.name());
+        var referer = javalinContext.header("Referer");
+        javalinContext.redirect(referer != null ? referer : contextPath, HttpStatus.SEE_OTHER);
+        return "";
+    }
+
+    private Temperature.Unit readUnitPreference(Context javalinContext) {
+        var cookie = javalinContext.cookie("temperature_unit");
+        if (cookie != null) {
+            try {
+                return Temperature.Unit.valueOf(cookie);
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+        return Temperature.Unit.FAHRENHEIT;
     }
 
     String withLayout(@Nullable Boolean htmx, UIRequestContext req, JteModel content, Context javalinContext) {

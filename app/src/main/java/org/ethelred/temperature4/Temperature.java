@@ -54,4 +54,8 @@ public record Temperature(double celsius) {
         // hard coded to F for now.
         return String.valueOf(Math.round(fahrenheit()));
     }
+
+    public String display(Unit unit) {
+        return Math.round(temperature(unit)) + "°" + unit.symbol();
+    }
 }

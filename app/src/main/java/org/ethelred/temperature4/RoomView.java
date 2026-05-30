@@ -5,9 +5,17 @@ public interface RoomView extends NamedResult<RoomView> {
 
     String roomTemp();
 
+    default String roomTemp(Temperature.Unit unit) {
+        return roomTemp();
+    }
+
     String mode();
 
     String displaySetting();
+
+    default String displaySetting(Temperature.Unit unit) {
+        return displaySetting();
+    }
 
     @Override
     default RoomView get() {

@@ -11,4 +11,10 @@ public record DailyTemp(Temperature min, Temperature max) {
     <span class="low">%s</span>/<span class="high">%s</span>
     """.formatted(min.display(), max.display());
     }
+
+    public String display(Temperature.Unit unit) {
+        return """
+    <span class="low">%s</span>/<span class="high">%s</span>
+    """.formatted(min.display(unit), max.display(unit));
+    }
 }
