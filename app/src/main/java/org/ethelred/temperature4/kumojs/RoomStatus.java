@@ -22,6 +22,16 @@ public record RoomStatus(
         return "--";
     }
 
+    public String setting(Temperature.Unit unit) {
+        if ("heat".equalsIgnoreCase(mode()) && spHeat != null) {
+            return spHeat.display(unit);
+        }
+        if ("cool".equalsIgnoreCase(mode()) && spCool != null) {
+            return spCool.display(unit);
+        }
+        return "--";
+    }
+
     public int sp() {
         if ("heat".equalsIgnoreCase(mode()) && spHeat != null) {
             return toInt(spHeat);

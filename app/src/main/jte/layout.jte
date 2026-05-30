@@ -9,7 +9,11 @@
     <title>Heat Control${"".equals(req.title()) ? "" : " - " + req.title()}</title>
 </head>
 <body class="${req.rootClass()} App">
-<h1>${"".equals(req.title()) ? "Heat Control" : req.title()}</h1>
+<h1>${"".equals(req.title()) ? "Heat Control" : req.title()}
+    <form method="post" action="${req.contextPath()}preferences/unit" style="display:inline">
+        <button type="submit">°${req.temperatureUnit().symbol()}</button>
+    </form>
+</h1>
 <div id="content">
 ${body}
 </div>
