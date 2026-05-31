@@ -11,7 +11,6 @@ import io.avaje.http.api.Header;
 import io.avaje.http.api.MediaType;
 import io.avaje.http.api.Post;
 import io.avaje.http.api.Produces;
-import io.javalin.http.ContentType;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
 import java.util.List;
