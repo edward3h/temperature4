@@ -11,7 +11,6 @@ import io.avaje.http.api.Header;
 import io.avaje.http.api.MediaType;
 import io.avaje.http.api.Post;
 import io.avaje.http.api.Produces;
-import io.javalin.http.ContentType;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
 import java.util.List;
@@ -119,7 +118,7 @@ public class UIController {
     }
 
     String withLayout(@Nullable Boolean htmx, UIRequestContext req, JteModel content, Context javalinContext) {
-        javalinContext.contentType(ContentType.TEXT_HTML);
+        javalinContext.contentType("text/html; charset=UTF-8");
         if (htmx != null && htmx) {
             return writable(content);
         } else {

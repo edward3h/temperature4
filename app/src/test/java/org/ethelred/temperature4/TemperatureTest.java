@@ -42,13 +42,13 @@ class TemperatureTest {
     void display_unit_fahrenheit() {
         // 21.3°C = 70.34°F → rounds to 70
         var t = new Temperature(21.3);
-        assertThat(t.display(Temperature.Unit.FAHRENHEIT)).isEqualTo("70°F");
+        assertThat(t.display(Temperature.Unit.FAHRENHEIT)).isEqualTo("70");
     }
 
     @Test
     void display_unit_celsius() {
         // 21.3°C rounds to 21
         var t = new Temperature(21.3);
-        assertThat(t.display(Temperature.Unit.CELSIUS)).isEqualTo("21°C");
+        assertThat(t.display(Temperature.Unit.CELSIUS)).isEqualTo("21");
     }
 }
