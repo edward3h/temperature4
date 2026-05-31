@@ -56,6 +56,6 @@ public record Temperature(double celsius) {
     }
 
     public String display(Unit unit) {
-        return Math.round(temperature(unit)) + "°" + unit.symbol();
+        return String.valueOf(Math.round(temperature(unit)));
     }
 }

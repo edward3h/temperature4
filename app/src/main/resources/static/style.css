@@ -95,6 +95,18 @@ div.numbers,
 h1 {
   margin-block-end: 0.4em;
 }
+h1 form {
+  display: inline;
+}
+h1 button {
+  appearance: none;
+  background: transparent;
+  border: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  padding: 0 0.2em;
+}
 .controls h1 {
   font-size: 1.6em;
 }

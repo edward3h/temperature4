@@ -119,7 +119,7 @@ public class UIController {
     }
 
     String withLayout(@Nullable Boolean htmx, UIRequestContext req, JteModel content, Context javalinContext) {
-        javalinContext.contentType(ContentType.TEXT_HTML);
+        javalinContext.contentType("text/html; charset=UTF-8");
         if (htmx != null && htmx) {
             return writable(content);
         } else {
