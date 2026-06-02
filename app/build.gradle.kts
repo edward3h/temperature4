@@ -22,7 +22,7 @@ dependencies {
     implementation("io.avaje:avaje-http-client:3.9")
 //    implementation("io.avaje:avaje-jex:3.0-RC20")
     implementation("io.javalin:javalin:7.2.2")
-    implementation("io.avaje:avaje-jsonb:3.13")
+    implementation("io.avaje:avaje-jsonb:3.14")
     implementation("gg.jte:jte:3.2.4")
     implementation("gg.jte:jte-models:3.2.4")
     implementation("org.jspecify:jspecify:1.0.0")
