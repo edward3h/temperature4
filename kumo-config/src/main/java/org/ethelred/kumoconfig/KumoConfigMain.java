@@ -15,7 +15,13 @@ public class KumoConfigMain {
         }
 
         var username = console.readLine("Enter username: ");
-        var password = new String(console.readPassword("Enter password: "));
+        var passwordChars = console.readPassword("Enter password: ");
+        if (username == null || passwordChars == null) {
+            System.err.println("No input received.");
+            System.exit(1);
+            return;
+        }
+        var password = new String(passwordChars);
 
         var outputPath = Path.of("kumo.cfg");
         try {
