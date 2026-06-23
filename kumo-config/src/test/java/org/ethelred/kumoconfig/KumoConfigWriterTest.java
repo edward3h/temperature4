@@ -36,4 +36,39 @@ class KumoConfigWriterTest {
         assertThat(parsed.cryptoSerial()).isEqualTo(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8});
         assertThat(parsed.w()).hasLength(32); // the fixed W constant decodes to 32 bytes
     }
+
+    @Test
+    void write_multipleDevices_roundTripsAllOfThem(@TempDir Path tempDir) throws Exception {
+        var device1 = new KumoCloudDevice(
+                "SERIAL001",
+                "Living Room",
+                "000102030405060708",
+                "F",
+                Base64.getEncoder().encodeToString(new byte[] {1, 2, 3, 4}),
+                "192.168.1.100");
+        var device2 = new KumoCloudDevice(
+                "SERIAL002",
+                "Bedroom",
+                "0a0b0c0d0e0f10111213",
+                "F",
+                Base64.getEncoder().encodeToString(new byte[] {5, 6, 7, 8}),
+                "192.168.1.101");
+        var device3 = new KumoCloudDevice(
+                "SERIAL003",
+                "Kitchen",
+                "14151617181920212223",
+                "F",
+                Base64.getEncoder().encodeToString(new byte[] {9, 10, 11, 12}),
+                "192.168.1.102");
+
+        var configFile = tempDir.resolve("kumo.cfg");
+        new KumoConfigWriter().write(configFile, "user@example.com", List.of(device1, device2, device3));
+
+        var devices = new KumoConfigParser(configFile.toString()).parse();
+
+        assertThat(devices).hasSize(3);
+        assertThat(devices.stream().map(d -> d.label()).toList()).containsExactly("Living Room", "Bedroom", "Kitchen");
+        assertThat(devices.stream().map(d -> d.address()).toList())
+                .containsExactly("192.168.1.100", "192.168.1.101", "192.168.1.102");
+    }
 }
