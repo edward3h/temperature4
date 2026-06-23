@@ -29,7 +29,7 @@ Two judgment calls were made while turning the spec into concrete code. Both are
 - Modify: `settings.gradle.kts`
 - Create: `kumo-config/build.gradle.kts`
 
-- [ ] **Step 1: Add the module to settings**
+- [x] **Step 1: Add the module to settings**
 
 Edit `settings.gradle.kts`:
 
@@ -40,7 +40,7 @@ include("kumo")
 include("kumo-config")
 ```
 
-- [ ] **Step 2: Create the module's build file**
+- [x] **Step 2: Create the module's build file**
 
 Create `kumo-config/build.gradle.kts`:
 
@@ -92,12 +92,12 @@ spotless {
 
 `testImplementation(project(":kumo"))` is intentional and test-only: production code in `kumo-config` depends on nothing from `kumo` (per the spec's Architecture section), but `KumoConfigWriterTest` (Task 5) needs the real `KumoConfigParser` to verify round-trip compatibility with the file format.
 
-- [ ] **Step 3: Verify the module is recognised**
+- [x] **Step 3: Verify the module is recognised**
 
 Run: `./gradlew :kumo-config:tasks`
 Expected: task list prints without error (no source files yet, so nothing to compile).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add settings.gradle.kts kumo-config/build.gradle.kts
@@ -113,7 +113,7 @@ git commit -m "build: scaffold kumo-config module"
 
 No dedicated test for this step — it's a two-constructor exception type with no logic of its own. It's exercised indirectly by every test in Tasks 4 and 6 that asserts a `KumoCloudException` is thrown.
 
-- [ ] **Step 1: Create the exception**
+- [x] **Step 1: Create the exception**
 
 ```java
 // (C) Edward Harman 2026
@@ -130,7 +130,7 @@ public class KumoCloudException extends RuntimeException {
 }
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add kumo-config/src/main/java/org/ethelred/kumoconfig/KumoCloudException.java
@@ -146,7 +146,7 @@ git commit -m "feat: add KumoCloudException"
 
 No dedicated test — a plain data record, exercised by Tasks 4 and 5's tests.
 
-- [ ] **Step 1: Create the record**
+- [x] **Step 1: Create the record**
 
 ```java
 // (C) Edward Harman 2026
@@ -158,7 +158,7 @@ public record KumoCloudDevice(
 
 All six fields are passed through verbatim from the cloud response — `password` is already base64-encoded and `cryptoSerial` is already hex-encoded by Kumo Cloud, matching exactly what the existing `KumoConfigParser.parseDevice` expects to decode (`Base64.getDecoder().decode(...)` / hex-to-bytes). Nothing in this module re-encodes them.
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add kumo-config/src/main/java/org/ethelred/kumoconfig/KumoCloudDevice.java
@@ -175,7 +175,7 @@ git commit -m "feat: add KumoCloudDevice record"
 
 This mirrors the legacy `kumoConfig.ts`'s `processcfg`/`parsechildren`/`parsezone` recursion: `username` comes from response index 0, the children map comes from response index 2's `children` field (index 1 is ignored), and each child in that map may have its own `zoneTable` (a map of device entries) and its own nested `children` (recursed). A child with no `children` field simply isn't recursed into — that's the normal terminating case, not an error.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `kumo-config/src/test/java/org/ethelred/kumoconfig/KumoCloudConfigParserTest.java`:
 
@@ -278,12 +278,12 @@ class KumoCloudConfigParserTest {
 }
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `./gradlew :kumo-config:test`
 Expected: FAIL — `KumoCloudConfigParser` does not exist yet.
 
-- [ ] **Step 3: Implement `KumoCloudConfigParser`**
+- [x] **Step 3: Implement `KumoCloudConfigParser`**
 
 Create `kumo-config/src/main/java/org/ethelred/kumoconfig/KumoCloudConfigParser.java`:
 
@@ -418,12 +418,12 @@ public class KumoCloudConfigParser {
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `./gradlew :kumo-config:test`
 Expected: PASS (all four tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add kumo-config/src/main/java/org/ethelred/kumoconfig/KumoCloudConfigParser.java \
@@ -439,7 +439,7 @@ git commit -m "feat: add KumoCloudConfigParser"
 - Create: `kumo-config/src/main/java/org/ethelred/kumoconfig/KumoConfigWriter.java`
 - Test: `kumo-config/src/test/java/org/ethelred/kumoconfig/KumoConfigWriterTest.java`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `kumo-config/src/test/java/org/ethelred/kumoconfig/KumoConfigWriterTest.java`:
 
@@ -485,12 +485,12 @@ class KumoConfigWriterTest {
 }
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `./gradlew :kumo-config:test`
 Expected: FAIL — `KumoConfigWriter` does not exist yet.
 
-- [ ] **Step 3: Implement `KumoConfigWriter`**
+- [x] **Step 3: Implement `KumoConfigWriter`**
 
 Create `kumo-config/src/main/java/org/ethelred/kumoconfig/KumoConfigWriter.java`:
 
@@ -549,12 +549,12 @@ public class KumoConfigWriter {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `./gradlew :kumo-config:test`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add kumo-config/src/main/java/org/ethelred/kumoconfig/KumoConfigWriter.java \
@@ -572,7 +572,7 @@ git commit -m "feat: add KumoConfigWriter"
 
 Tested against a local `com.sun.net.httpserver.HttpServer` (JDK built-in, no new test dependency needed) rather than the real Kumo Cloud endpoint — see Non-goals in the spec. The login URI is package-private-overridable so the test can point at the local server while production code always uses the real one.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `kumo-config/src/test/java/org/ethelred/kumoconfig/KumoCloudClientTest.java`:
 
@@ -656,12 +656,12 @@ class KumoCloudClientTest {
 }
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `./gradlew :kumo-config:test`
 Expected: FAIL — `KumoCloudClient` does not exist yet.
 
-- [ ] **Step 3: Implement `KumoCloudClient`**
+- [x] **Step 3: Implement `KumoCloudClient`**
 
 Create `kumo-config/src/main/java/org/ethelred/kumoconfig/KumoCloudClient.java`:
 
@@ -735,12 +735,12 @@ public class KumoCloudClient {
 
 No `Accept-Encoding` header — see "Deviations from the spec" at the top of this plan.
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `./gradlew :kumo-config:test`
 Expected: PASS (all three tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add kumo-config/src/main/java/org/ethelred/kumoconfig/KumoCloudClient.java \
@@ -757,7 +757,7 @@ git commit -m "feat: add KumoCloudClient"
 
 No automated test — this is the interactive CLI glue (console I/O), exercised manually in the Verification section.
 
-- [ ] **Step 1: Implement `KumoConfigMain`**
+- [x] **Step 1: Implement `KumoConfigMain`**
 
 ```java
 // (C) Edward Harman 2026
@@ -796,12 +796,12 @@ public class KumoConfigMain {
 }
 ```
 
-- [ ] **Step 2: Verify the module builds**
+- [x] **Step 2: Verify the module builds**
 
 Run: `./gradlew :kumo-config:build`
 Expected: BUILD SUCCESSFUL (compiles, runs all `kumo-config` tests, passes Spotless).
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add kumo-config/src/main/java/org/ethelred/kumoconfig/KumoConfigMain.java
@@ -818,16 +818,16 @@ git commit -m "feat: add KumoConfigMain CLI entry point"
 - Modify: `kumo/src/main/java/org/ethelred/kumo/KumoConfigParser.java:20-30`
 - Modify: `kumo/src/test/java/org/ethelred/kumo/KumoConfigParserTest.java:17-39`
 
-- [ ] **Step 1: Remove the now-obsolete wrapper test**
+- [x] **Step 1: Remove the now-obsolete wrapper test**
 
 In `kumo/src/test/java/org/ethelred/kumo/KumoConfigParserTest.java`, delete the entire `parse_validConfigWithModuleExports` test (lines 17-39) — the `module.exports = ...;` format is no longer supported. Leave `parse_plainJson` and `parse_multipleRooms` as-is; they already cover pure JSON.
 
-- [ ] **Step 2: Run tests to confirm the remaining ones still pass**
+- [x] **Step 2: Run tests to confirm the remaining ones still pass**
 
 Run: `./gradlew :kumo:test`
 Expected: PASS (2 tests: `parse_plainJson`, `parse_multipleRooms`).
 
-- [ ] **Step 3: Simplify the parser**
+- [x] **Step 3: Simplify the parser**
 
 In `kumo/src/main/java/org/ethelred/kumo/KumoConfigParser.java`, replace the `parse()` method:
 
@@ -854,12 +854,12 @@ with:
     }
 ```
 
-- [ ] **Step 4: Run tests to confirm they still pass**
+- [x] **Step 4: Run tests to confirm they still pass**
 
 Run: `./gradlew :kumo:test`
 Expected: PASS (same 2 tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add kumo/src/main/java/org/ethelred/kumo/KumoConfigParser.java \
@@ -876,21 +876,21 @@ git commit -m "refactor: simplify KumoConfigParser to read pure JSON only"
 
 This file currently starts with `module.exports = \n` followed by the JSON object on its own line, and has no trailing `;`. After Task 8, `KumoConfigParser` no longer strips that prefix, so the app would fail to parse its own config on next start unless this file is converted now.
 
-- [ ] **Step 1: Read the current file**
+- [x] **Step 1: Read the current file**
 
 Run: `cat app/src/main/resources/kumo.cfg`
 Confirm it still has the two-line shape: `module.exports = ` on line 1, the JSON object on line 2.
 
-- [ ] **Step 2: Rewrite as pure JSON**
+- [x] **Step 2: Rewrite as pure JSON**
 
 Edit the file to delete line 1 (`module.exports = `) entirely, leaving only the JSON object as the file's full content.
 
-- [ ] **Step 3: Verify it's valid JSON**
+- [x] **Step 3: Verify it's valid JSON**
 
 Run: `python3 -m json.tool app/src/main/resources/kumo.cfg > /dev/null && echo OK`
 Expected: `OK`
 
-- [ ] **Step 4: No commit needed**
+- [x] **Step 4: No commit needed**
 
 This file is gitignored (confirmed by its absence from `git status`), so this is a local-environment change only. It does need to be repeated on any other machine/deployment running this app with the old-format file — most notably the production host, which is a manual step for the project owner (see Verification section).
 
@@ -898,17 +898,17 @@ This file is gitignored (confirmed by its absence from `git status`), so this is
 
 ### Task 10: Final verification
 
-- [ ] **Step 1: Full build across all modules**
+- [x] **Step 1: Full build across all modules**
 
 Run: `./gradlew build`
 Expected: BUILD SUCCESSFUL — compiles `app`, `kumo`, `kumo-config`; runs all non-integration tests; passes Spotless on all three modules.
 
-- [ ] **Step 2: Build the installable CLI distribution**
+- [x] **Step 2: Build the installable CLI distribution**
 
 Run: `./gradlew :kumo-config:installDist`
 Expected: BUILD SUCCESSFUL, producing `kumo-config/build/install/kumo-config/bin/kumo-config`.
 
-- [ ] **Step 3: Manual smoke test of the CLI (project owner only — needs real Kumo Cloud credentials)**
+- [x] **Step 3: Manual smoke test of the CLI (project owner only — needs real Kumo Cloud credentials)**
 
 From a real terminal (not through Gradle):
 
@@ -923,10 +923,10 @@ Enter real Kumo Cloud credentials when prompted. Confirm:
 
 I should not run this step myself — it requires real account credentials that only the project owner should be entering, and matches the "interactive masked prompt" decision made during brainstorming specifically so credentials never need to be typed into an automated context.
 
-- [ ] **Step 4: Remind the project owner about the production `eternal.local` config**
+- [x] **Step 4: Remind the project owner about the production `eternal.local` config**
 
 The deployed `kumo.cfg` on `eternal.local` is still in the old `module.exports = ...` format. Once this change ships, that file needs the same one-line-deletion conversion done in Task 9 (or a fresh run of the new CLI) before that host's app instance will start successfully. This is a manual deployment step, not something to automate as part of this change.
 
-- [ ] **Step 5: Clean up the legacy tool reference (optional, ask before doing)**
+- [x] **Step 5: Clean up the legacy tool reference (optional, ask before doing)**
 
 `kumojs`'s `config` functionality is now fully superseded. Removing the `kumojs` npm package entirely is out of scope for this plan (it's a separate repository) — flagging it only so the project owner can decide separately whether to retire it.
