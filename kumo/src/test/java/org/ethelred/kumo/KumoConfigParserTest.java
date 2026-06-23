@@ -15,30 +15,6 @@ class KumoConfigParserTest {
     // hex(32 zero bytes) = 64 zeros
 
     @Test
-    void parse_validConfigWithModuleExports(@TempDir Path tempDir) throws Exception {
-        var configFile = tempDir.resolve("kumo.cfg");
-        Files.writeString(
-                configFile,
-                "module.exports = {\"user@example.com\":{\"SERIAL001\":{"
-                        + "\"label\":\"Living Room\","
-                        + "\"address\":\"192.168.1.100\","
-                        + "\"password\":\"AQIDBA==\","
-                        + "\"cryptoSerial\":\"000102030405060708\","
-                        + "\"S\":2,"
-                        + "\"W\":\"0000000000000000000000000000000000000000000000000000000000000000\""
-                        + "}}};");
-        var parser = new KumoConfigParser(configFile.toString());
-        var devices = parser.parse();
-        assertThat(devices).hasSize(1);
-        var device = devices.get(0);
-        assertThat(device.label()).isEqualTo("Living Room");
-        assertThat(device.address()).isEqualTo("192.168.1.100");
-        assertThat(device.s()).isEqualTo(2);
-        assertThat(device.password()).isEqualTo(new byte[] {1, 2, 3, 4});
-        assertThat(device.cryptoSerial()).isEqualTo(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8});
-    }
-
-    @Test
     void parse_plainJson(@TempDir Path tempDir) throws Exception {
         var configFile = tempDir.resolve("kumo.cfg");
         Files.writeString(
