@@ -91,4 +91,26 @@ class KumoCloudConfigParserTest {
 
         assertThat(exception).hasMessageThat().contains("Unexpected response from Kumo Cloud");
     }
+
+    @Test
+    void parse_deviceMissingRequiredField_throwsKumoCloudException() {
+        var response = """
+                [
+                  {"username":"user@example.com"},
+                  {},
+                  {"children":{
+                    "site1":{
+                      "zoneTable":{
+                        "zone1":{"label":"Room A","cryptoSerial":"abc123",
+                                 "cryptoKeySet":"F","password":"pw1","address":"10.0.0.1"}
+                      }
+                    }
+                  }}
+                ]
+                """;
+
+        var exception = assertThrows(KumoCloudException.class, () -> parser.parse(response));
+
+        assertThat(exception).hasMessageThat().contains("Unexpected response from Kumo Cloud");
+    }
 }

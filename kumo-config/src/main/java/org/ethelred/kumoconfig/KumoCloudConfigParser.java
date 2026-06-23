@@ -123,6 +123,14 @@ public class KumoCloudConfigParser {
             }
         }
         reader.endObject();
+        if (serial == null
+                || label == null
+                || cryptoSerial == null
+                || cryptoKeySet == null
+                || password == null
+                || address == null) {
+            throw new KumoCloudException("Unexpected response from Kumo Cloud: device missing required field");
+        }
         return new KumoCloudDevice(serial, label, cryptoSerial, cryptoKeySet, password, address);
     }
 }
