@@ -9,7 +9,7 @@ repositories {
 
 dependencies {
     annotationProcessor("io.avaje:avaje-jsonb-generator:3.14")
-    annotationProcessor("io.soabase.record-builder:record-builder-processor:52")
+    annotationProcessor("io.soabase.record-builder:record-builder-processor:53")
     compileOnly("io.soabase.record-builder:record-builder-core:53")
     implementation("io.avaje:avaje-jsonb:3.14")
     implementation("org.jspecify:jspecify:1.0.0")
