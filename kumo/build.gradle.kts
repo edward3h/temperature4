@@ -12,7 +12,7 @@ dependencies {
     annotationProcessor("io.soabase.record-builder:record-builder-processor:52")
     compileOnly("io.soabase.record-builder:record-builder-core:53")
     implementation("io.avaje:avaje-jsonb:3.14")
-    implementation("org.jspecify:jspecify:1.0.0")
+    implementation("org.jspecify:jspecify:1.0.1")
     testImplementation("com.google.truth:truth:1.4.5")
 }
 
