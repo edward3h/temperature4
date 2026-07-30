@@ -25,7 +25,7 @@ dependencies {
     implementation("io.avaje:avaje-jsonb:3.14")
     implementation("gg.jte:jte:3.2.4")
     implementation("gg.jte:jte-models:3.2.4")
-    implementation("org.jspecify:jspecify:1.0.0")
+    implementation("org.jspecify:jspecify:1.0.1")
     implementation("io.avaje:avaje-config:5.2")
     implementation("org.eclipse.store:storage-embedded:4.2.0")
     implementation("com.github.ben-manes.caffeine:caffeine:3.2.4")
