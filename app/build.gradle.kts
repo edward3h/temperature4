@@ -18,7 +18,7 @@ dependencies {
     annotationProcessor("io.soabase.record-builder:record-builder-processor:52")
     compileOnly("io.soabase.record-builder:record-builder-core:53")
     implementation("io.avaje:avaje-inject:12.6")
-    implementation("io.avaje:avaje-http-api:3.10")
+    implementation("io.avaje:avaje-http-api:3.11")
     implementation("io.avaje:avaje-http-client:3.11")
 //    implementation("io.avaje:avaje-jex:3.0-RC20")
     implementation("io.javalin:javalin:7.2.3")
