@@ -2,7 +2,7 @@ plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     application
     id("gg.jte.gradle") version "3.2.4"
-    id("com.diffplug.spotless") version "8.7.0"
+    id("com.diffplug.spotless") version "8.10.0"
 }
 
 repositories {
@@ -12,22 +12,22 @@ repositories {
 
 dependencies {
     annotationProcessor("io.avaje:avaje-inject-generator:12.6")
-    annotationProcessor("io.avaje:avaje-http-javalin-generator:3.9")
-    annotationProcessor("io.avaje:avaje-http-client-generator:3.9")
+    annotationProcessor("io.avaje:avaje-http-javalin-generator:3.11")
+    annotationProcessor("io.avaje:avaje-http-client-generator:3.11")
     annotationProcessor("io.avaje:avaje-jsonb-generator:3.14")
     annotationProcessor("io.soabase.record-builder:record-builder-processor:52")
-    compileOnly("io.soabase.record-builder:record-builder-core:52")
+    compileOnly("io.soabase.record-builder:record-builder-core:53")
     implementation("io.avaje:avaje-inject:12.6")
-    implementation("io.avaje:avaje-http-api:3.9")
-    implementation("io.avaje:avaje-http-client:3.9")
+    implementation("io.avaje:avaje-http-api:3.11")
+    implementation("io.avaje:avaje-http-client:3.11")
 //    implementation("io.avaje:avaje-jex:3.0-RC20")
-    implementation("io.javalin:javalin:7.2.2")
+    implementation("io.javalin:javalin:7.2.3")
     implementation("io.avaje:avaje-jsonb:3.14")
     implementation("gg.jte:jte:3.2.4")
     implementation("gg.jte:jte-models:3.2.4")
-    implementation("org.jspecify:jspecify:1.0.0")
+    implementation("org.jspecify:jspecify:1.0.1")
     implementation("io.avaje:avaje-config:5.2")
-    implementation("org.eclipse.store:storage-embedded:4.1.0")
+    implementation("org.eclipse.store:storage-embedded:4.2.0")
     implementation("com.github.ben-manes.caffeine:caffeine:3.2.4")
     implementation(project(":kumo"))
     jteGenerate("gg.jte:jte-models:3.2.4")

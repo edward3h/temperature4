@@ -1,6 +1,6 @@
 plugins {
     `java-library`
-    id("com.diffplug.spotless") version "8.7.0"
+    id("com.diffplug.spotless") version "8.10.0"
 }
 
 repositories {
@@ -10,9 +10,9 @@ repositories {
 dependencies {
     annotationProcessor("io.avaje:avaje-jsonb-generator:3.14")
     annotationProcessor("io.soabase.record-builder:record-builder-processor:52")
-    compileOnly("io.soabase.record-builder:record-builder-core:52")
+    compileOnly("io.soabase.record-builder:record-builder-core:53")
     implementation("io.avaje:avaje-jsonb:3.14")
-    implementation("org.jspecify:jspecify:1.0.0")
+    implementation("org.jspecify:jspecify:1.0.1")
     testImplementation("com.google.truth:truth:1.4.5")
 }
 
