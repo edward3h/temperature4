@@ -69,12 +69,11 @@ public class KumoCloudConfigParser {
 
     private List<KumoCloudDevice> readChildren(JsonReader reader) {
         var devices = new ArrayList<KumoCloudDevice>();
-        reader.beginObject();
-        while (reader.hasNextField()) {
-            reader.nextField(); // opaque child id, not needed
+        reader.beginArray();
+        while (reader.hasNextElement()) {
             devices.addAll(readChild(reader));
         }
-        reader.endObject();
+        reader.endArray();
         return devices;
     }
 

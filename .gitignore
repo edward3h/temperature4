@@ -11,3 +11,4 @@ app/storage
 *.log
 app/src/main/resources/kumo.cfg
 supertool
+test-kumo-config-response.json
