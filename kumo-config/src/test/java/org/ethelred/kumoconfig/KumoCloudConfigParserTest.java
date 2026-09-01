@@ -19,22 +19,22 @@ class KumoCloudConfigParserTest {
                 [
                   {"username":"user@example.com"},
                   {},
-                  {"children":{
-                    "site1":{
+                  {"children":[
+                    {
                       "zoneTable":{
                         "zone1":{"serial":"SERIAL1","label":"Room A","cryptoSerial":"abc123",
                                  "cryptoKeySet":"F","password":"pw1","address":"10.0.0.1"}
                       },
-                      "children":{
-                        "site2":{
+                      "children":[
+                        {
                           "zoneTable":{
                             "zone2":{"serial":"SERIAL2","label":"Room B","cryptoSerial":"def456",
                                      "cryptoKeySet":"F","password":"pw2","address":"10.0.0.2"}
                           }
                         }
-                      }
+                      ]
                     }
-                  }}
+                  ]}
                 ]
                 """;
 
@@ -58,14 +58,14 @@ class KumoCloudConfigParserTest {
                 [
                   {"username":"user@example.com"},
                   {},
-                  {"children":{
-                    "site1":{
+                  {"children":[
+                    {
                       "zoneTable":{
                         "zone1":{"serial":"SERIAL1","label":"Room A","cryptoSerial":"abc123",
                                  "cryptoKeySet":"F","password":"pw1","address":"10.0.0.1"}
                       }
                     }
-                  }}
+                  ]}
                 ]
                 """;
 
@@ -98,14 +98,14 @@ class KumoCloudConfigParserTest {
                 [
                   {"username":"user@example.com"},
                   {},
-                  {"children":{
-                    "site1":{
+                  {"children":[
+                    {
                       "zoneTable":{
                         "zone1":{"label":"Room A","cryptoSerial":"abc123",
                                  "cryptoKeySet":"F","password":"pw1","address":"10.0.0.1"}
                       }
                     }
-                  }}
+                  ]}
                 ]
                 """;
 
