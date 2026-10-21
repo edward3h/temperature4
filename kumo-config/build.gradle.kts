@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-    implementation("io.avaje:avaje-jsonb:3.15")
+    implementation("io.avaje:avaje-jsonb:3.16")
     testImplementation(project(":kumo"))
     testImplementation("com.google.truth:truth:1.4.5")
 }
