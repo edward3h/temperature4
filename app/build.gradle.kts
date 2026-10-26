@@ -31,7 +31,7 @@ dependencies {
     implementation("com.github.ben-manes.caffeine:caffeine:3.3.1")
     implementation(project(":kumo"))
     jteGenerate("gg.jte:jte-models:3.2.4")
-    runtimeOnly("org.logevents:logevents:0.5.10")
+    runtimeOnly("org.logevents:logevents:0.5.11")
     testImplementation("com.google.truth:truth:1.4.5")
 }
 
