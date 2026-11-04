@@ -27,7 +27,7 @@ dependencies {
     implementation("gg.jte:jte-models:3.2.5")
     implementation("org.jspecify:jspecify:1.0.1")
     implementation("io.avaje:avaje-config:5.2")
-    implementation("org.eclipse.store:storage-embedded:4.2.0")
+    implementation("org.eclipse.store:storage-embedded:4.3.0")
     implementation("com.github.ben-manes.caffeine:caffeine:3.3.1")
     implementation(project(":kumo"))
     jteGenerate("gg.jte:jte-models:3.2.5")
